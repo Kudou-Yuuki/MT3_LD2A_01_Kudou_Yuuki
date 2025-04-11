@@ -2,56 +2,96 @@
 #include <Novice.h>
 #include <corecrt_math.h>
 
+
+static const int kRowHeight = 20;
 static const int kColumnWidth = 60;
 
-Vector3 Add(const Vector3& v1, const Vector3& v2) {
-	return {
-		v1.x + v2.x,
-		v1.y + v2.y,
-		v1.z + v2.z
-	};
+Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result;
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.m[i][j] = m1.m[i][j] + m2.m[i][j];
+		}
+	}
+	return result;
 }
 
-Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
-	return {
-		v1.x - v2.x,
-		v1.y - v2.y,
-		v1.z - v2.z
-	};
+Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result;
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.m[i][j] = m1.m[i][j] - m2.m[i][j];
+		}
+	}
+	return result;
 }
 
-Vector3 Multiply(float scalar, const Vector3& v) { 
-	return {
-		scalar * v.x,
-		scalar * v.y,
-		scalar * v.z
-	}; 
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result;
+	for (int i= 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.m[i][j] = 0.0f;
+			for (int k = 0; k < 4; ++k) {
+				result.m[i][j] += m1.m[i][k] * m2.m[k][j];
+			}
+		}
+	}
+	return result;
 }
 
-float Dot(const Vector3& v1, const Vector3& v2) {
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+Matrix4x4 Inverse(const Matrix4x4& m) {
+	Matrix4x4 result;
+	float det = 0.0f;
+	for (int i = 0; i < 4; ++i) {
+		det += (m.m[0][i] * (m.m[1][(i + 1) % 4] * m.m[2][(i + 2) % 4] * m.m[3][(i + 3) % 4] - m.m[1][(i + 2) % 4] * m.m[2][(i + 1) % 4] * m.m[3][(i + 3) % 4]));
+	}
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.m[i][j] = (
+				(m.m[(i + 1) % 4][(j + 1) % 4] *
+				m.m[(i + 2) % 4][(j + 2) % 4] *
+				m.m[(i + 3) % 4][(j + 3) % 4]) -
+			    (m.m[(i + 1) % 4][(j + 3) % 4] *
+				m.m[(i + 2) % 4][(j + 2) % 4] *
+				m.m[(i + 3) % 4][(j + 1) % 4])) /
+			                       det;
+		}
+	}
+	return result;
 }
 
-float Length(const Vector3& v) { 
-	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+Matrix4x4 Transpose(const Matrix4x4& m) {
+	Matrix4x4 result;
+	for (int i= 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			result.m[i][j] = m.m[j][i];
+		}
+	}
+	return result;
 }
 
-Vector3 Normalize(const Vector3& v) {
-	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-	if (length == 0.0f) {
-		return {0.0f, 0.0f, 0.0f};
-	} else
-		return {
-		    v.x / length,
-		    v.y / length,
-		    v.z / length,
-		};
+Matrix4x4 MakeIdenity4x4() {
+	Matrix4x4 result;
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			if (i == j) {
+				result.m[i][j] = 1.0f;
+			} else {
+				result.m[i][j] = 0.0f;
+			}
+		}
+	}
+	return result;
 }
 
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 
-	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
-	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.y);
-	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%0.2f", vector.z);
-	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+	for (int row = 0; row < 4; ++row) {
+		for (int colum = 0; colum < 4; ++colum) {
+			Novice::ScreenPrintf(x + colum * kColumnWidth, y + (row+1) * kRowHeight, "%3.02f", matrix.m[row][colum]);
+		}
+	}
+
+	Novice::ScreenPrintf(x, y, "%s", label);
+
 }
