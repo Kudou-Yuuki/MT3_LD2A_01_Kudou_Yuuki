@@ -1,17 +1,22 @@
 #include "Function.h"
 #include <Novice.h>
 #include <corecrt_math.h>
-
+#include <assert.h>
 static const int kColumnWidth = 60;
 static const int kRowHeight = 20;
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix4x4) {
 	Vector3 result;
-	
 	result.x = vector.x * matrix4x4.m[0][0] + vector.y * matrix4x4.m[1][0] + vector.z * matrix4x4.m[2][0] + matrix4x4.m[3][0];
 	result.y = vector.x * matrix4x4.m[0][1] + vector.y * matrix4x4.m[1][1] + vector.z * matrix4x4.m[2][1] + matrix4x4.m[3][1];
 	result.z = vector.x * matrix4x4.m[0][2] + vector.y * matrix4x4.m[1][2] + vector.z * matrix4x4.m[2][2] + matrix4x4.m[3][2];
+	float w= vector.x * matrix4x4.m[0][3] + vector.y * matrix4x4.m[1][3] + vector.z * matrix4x4.m[2][3] + matrix4x4.m[3][3];
+	assert(w != 0);
+	result.x = result.x / w;
+	result.y = result.y / w;
+	result.z = result.z / w;
+
 	return result;
-}
+}			
 
 
 Matrix4x4 MakeTranslateMatrix(const Vector3& translate) {

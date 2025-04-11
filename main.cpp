@@ -38,13 +38,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Matrix4x4 trasformMatrix = {
 		// 列0
-		 1.0f, 3.0f, 1.0f, 2.0f,
+		 1.0f, 2.0f, 3.0f, 4.0f,
         // 列1
-	     2.0f, 1.0f, 4.0f, 2.0f,
+	     3.0f, 1.0f, 1.0f, 2.0f,
 	    // 列2
-	    3.0f, 1.0f, 2.0f, 1.0f,
+	    1.0f, 4.0f, 2.0f, 3.0f,
 		// 列3
-		4.0f, 2.0f, 3.0f, 3.0f};
+		2.0f, 2.0f, 1.0f, 3.0f
+		
+		};
 
 		Vector3 transformed = Transform(point, trasformMatrix);
 
