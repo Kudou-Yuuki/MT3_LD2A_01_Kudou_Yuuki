@@ -1,10 +1,13 @@
+
 #pragma once
+#include "../DirectXGame/math/Matrix4x4.h"
 #include "../DirectXGame/math/Vector3.h"
 
-Vector3 Add(const Vector3& v1, const Vector3& v2);
-Vector3 Subtract(const Vector3& v1, const Vector3& v2);
-Vector3 Multiply(float scalar, const Vector3& v);
-float Dot(const Vector3& v1, const Vector3& v2);
-float Length(const Vector3& v);
-Vector3 Normalize(const Vector3& v);
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
+
+Matrix4x4 MakeRotateXMatrix(float radian);
+Matrix4x4 MakeRotateYMatrix(float radian);
+Matrix4x4 MakeRotateZMatrix(float radian);
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
+
+

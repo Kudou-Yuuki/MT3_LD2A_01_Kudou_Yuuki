@@ -4,7 +4,7 @@
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";  
 
 static const int kColumnWidth = 60;  
-static const int kColumnHeight = 30;  
+static const int kRowHeight = 30;  
 
 // Windowsアプリでのエントリーポイント(main関数)  
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {  
@@ -16,6 +16,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
    char keys[256] = {0};  
    char preKeys[256] = {0};  
 
+    Vector3 rotate{0.4f, 1.43f, -0.8f};
+
+   Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+   Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+   Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+   Matrix4x4 rotateXYZMatrix = Multiply(rotateXMatrix, Multiply(rotateYMatrix, rotateZMatrix));
+
+     
    // ウィンドウの×ボタンが押されるまでループ  
    while (Novice::ProcessMessage() == 0) {  
        // フレームの開始  
@@ -28,16 +36,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        ///  
        /// ↓更新処理ここから  
        ///  
-       Vector3 v1{1.0f, 3.0f, -5.0f};  
-       Vector3 v2{4.0f, -1.0f, 2.0f};  
-       float k = {4.0f};  
-
-       Vector3 resultAdd = Add(v1, v2);  
-       Vector3 resultSubtract = Subtract(v1, v2);  
-       Vector3 resultMultiply = Multiply(k, v1);  
-       float resultDot = Dot(v1, v2);  
-       float resultLength = Length(v1);  
-       Vector3 resultNormalize = Normalize(v1);  
+   
        ///  
        /// ↑更新処理ここまで  
        ///  
@@ -46,13 +45,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
        /// ↓描画処理ここから  
        ///  
 
-       VectorScreenPrintf(0, 0, resultAdd, " : Add");  
-       VectorScreenPrintf(0, kColumnHeight, resultSubtract, "Subtract");  
-       VectorScreenPrintf(0, 2 * kColumnHeight, resultMultiply, "Multiply");  
-       Novice::ScreenPrintf(0, 3 * kColumnHeight, "%0.2f : Dot", resultDot);  
-       Novice::ScreenPrintf(0, 4 * kColumnHeight, "%0.2f : Length", resultLength);  
-       VectorScreenPrintf(0, 5 * kColumnHeight, resultNormalize, "Normalize");  
-
+       MatrixScreenPrintf(0, 0, rotateXMatrix, "rotateXMatrix");  
+       MatrixScreenPrintf(0, kRowHeight*5, rotateYMatrix, "rotateYMatrix");  
+       MatrixScreenPrintf(0, kRowHeight * 5*2, rotateZMatrix, "rotateZMatrix");  
+       MatrixScreenPrintf(0, kRowHeight * 5*3, rotateXYZMatrix, "rotateXYZMatrix");  
        ///  
        /// ↑描画処理ここまで  
        ///  

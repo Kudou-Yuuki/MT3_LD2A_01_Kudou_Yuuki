@@ -3,50 +3,58 @@
 #include <corecrt_math.h>
 
 static const int kColumnWidth = 60;
+static const int kRowHeight = 30;
 
-Vector3 Add(const Vector3& v1, const Vector3& v2) {
-	return {
-		v1.x + v2.x,
-		v1.y + v2.y,
-		v1.z + v2.z
-	};
-}
+void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label) {
 
-Vector3 Subtract(const Vector3& v1, const Vector3& v2) {
-	return {
-		v1.x - v2.x,
-		v1.y - v2.y,
-		v1.z - v2.z
-	};
-}
-
-Vector3 Multiply(float scalar, const Vector3& v) { 
-	return {
-		scalar * v.x,
-		scalar * v.y,
-		scalar * v.z
-	}; 
-}
-
-float Dot(const Vector3& v1, const Vector3& v2) {
-	return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
-}
-
-float Length(const Vector3& v) { 
-	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
-}
-
-Vector3 Normalize(const Vector3& v) {
-	float length = Length(v);
-	if (length == 0.0f) {
-		return {0.0f, 0.0f, 0.0f};
+	for (int row = 0; row < 4; ++row) {
+		for (int colum = 0; colum < 4; ++colum) {
+			Novice::ScreenPrintf(x + colum * kColumnWidth, y + (row + 1) * kRowHeight, "%3.02f", matrix.m[row][colum]);
+		}
 	}
-	return {v.x / length, v.y / length, v.z / length};
-}
-void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 
-	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
-	Novice::ScreenPrintf(x + kColumnWidth, y, "%0.2f", vector.y);
-	Novice::ScreenPrintf(x + kColumnWidth * 2, y, "%0.2f", vector.z);
-	Novice::ScreenPrintf(x + kColumnWidth * 3, y, "%s", label);
+	Novice::ScreenPrintf(x, y, "%s", label);
+}
+
+Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
+	Matrix4x4 result;
+	for (int row = 0; row < 4; ++row) {
+		for (int colum = 0; colum < 4; ++colum) {
+			result.m[row][colum] = m1.m[row][0] * m2.m[0][colum] + m1.m[row][1] * m2.m[1][colum] + m1.m[row][2] * m2.m[2][colum] + m1.m[row][3] * m2.m[3][colum];
+		}
+	}
+	return result;
+}
+
+Matrix4x4 MakeRotateXMatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = 1.0f;
+	result.m[1][1] = cosf(radian);
+	result.m[1][2] = -sinf(radian);
+	result.m[2][1] = sinf(radian);
+	result.m[2][2] = cosf(radian);
+	result.m[3][3] = 1.0f;
+	return result;
+}
+
+Matrix4x4 MakeRotateYMatrix(float radian) { 
+	Matrix4x4 result;
+	result.m[0][0] = cosf(radian);
+	result.m[0][2] = sinf(radian);
+	result.m[1][1] = 1.0f;
+	result.m[2][0] = -sinf(radian);
+	result.m[2][2] = cosf(radian);
+	result.m[3][3] = 1.0f;
+	return result;
+}
+
+Matrix4x4 MakeRotateZMatrix(float radian) {
+	Matrix4x4 result;
+	result.m[0][0] = cosf(radian);
+	result.m[0][1] = -sinf(radian);
+	result.m[1][0] = sinf(radian);
+	result.m[1][1] = cosf(radian);
+	result.m[2][2] = 1.0f;
+	result.m[3][3] = 1.0f;
+	return result;
 }
