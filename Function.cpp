@@ -37,12 +37,17 @@ float Length(const Vector3& v) {
 }
 
 Vector3 Normalize(const Vector3& v) {
-	float length = Length(v);
+	float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 	if (length == 0.0f) {
 		return {0.0f, 0.0f, 0.0f};
-	}
-	return {v.x / length, v.y / length, v.z / length};
+	} else
+		return {
+		    v.x / length,
+		    v.y / length,
+		    v.z / length,
+		};
 }
+
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 
 	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
