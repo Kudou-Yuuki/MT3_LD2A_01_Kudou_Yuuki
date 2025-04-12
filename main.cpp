@@ -8,8 +8,7 @@ static const int kColumnWidth = 60;
 static const int kRowHeight = 30;
 
 
-static const int kRowHeight = 20;
-static const int kColumnWidth = 60;
+
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
