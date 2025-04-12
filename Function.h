@@ -1,12 +1,15 @@
-#pragma once
 
+
+#pragma once
+#include "../DirectXGame/math/Vector3.h"
 #include "../DirectXGame/math/Matrix4x4.h"
 
-Matrix4x4 Add(const Matrix4x4& m1, const Matrix4x4& m2);
-Matrix4x4 Subtract(const Matrix4x4& m1, const Matrix4x4& m2);
-Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
-Matrix4x4 Inverse(const Matrix4x4& m);
-Matrix4x4 Transpose(const Matrix4x4& v);
-Matrix4x4 MakeIdenity4x4();
+
+void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
+Matrix4x4 MakeTranslateMatrix(const Vector3& translate);
+
+Matrix4x4 MakeScaleMatrix(const Vector3& scale);
+
+Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix4x4);
