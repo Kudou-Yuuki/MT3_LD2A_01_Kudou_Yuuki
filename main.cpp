@@ -1,3 +1,4 @@
+
 #include "../DirectXGame/math/Vector3.h"
 #include "Function.h"
 #include <Novice.h>
@@ -6,6 +7,9 @@ const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
 static const int kColumnWidth = 60;
 static const int kRowHeight = 30;
 
+
+static const int kRowHeight = 20;
+static const int kColumnWidth = 60;
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
@@ -28,8 +32,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓更新処理ここから
 		///
+
 		Vector3 translate{4.1f, 2.6f, 0.8f};
 		Vector3 scale{1.5f, 5.2f, 7.3f};
+
 
 		Matrix4x4 translateMatrix = MakeTranslateMatrix(translate);
 		Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
@@ -64,6 +70,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		MatrixScreenPrintf(0, kRowHeight * 5, scaleMatrix, "scaleMatrix");
 
 		
+
 		///
 		/// ↑描画処理ここまで
 		///
