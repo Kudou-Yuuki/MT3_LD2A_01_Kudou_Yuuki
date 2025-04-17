@@ -1,4 +1,4 @@
-#include "../DirectXGame/math/Vector3.h"
+#include "../External/KamataEngine/include/math/Vector3.h"
 #include "Function.h"
 #include <Novice.h>
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
