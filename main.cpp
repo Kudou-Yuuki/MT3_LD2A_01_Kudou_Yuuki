@@ -1,6 +1,11 @@
-#include <Novice.h>
 
-const char kWindowTitle[] = "学籍番号";
+#include "../DirectXGame/math/Vector3.h"
+#include "Function.h"
+#include <Novice.h>
+const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
+
+static const int kColumnWidth = 60;
+static const int kRowHeight = 30;
 
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
@@ -25,6 +30,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
+		Vector3 rotate{0.4f, 1.43f, -0.8f};
+		
+		Matrix4x4 rotateXmatrix = MakeRotateXMatrix(rotate.x);
+		Matrix4x4 rotateYmatrix = MakeRotateYMatrix(rotate.y);
+		Matrix4x4 rotateZmatrix = MakeRotateZMatrix(rotate.z);
+		Matrix4x4 rotateXYZmatrix = Multiply(rotateXmatrix, Multiply(rotateYmatrix, rotateZmatrix));
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -32,6 +44,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+
+	
+		MatrixScreenPrintf(0, 0, rotateXmatrix, "rotateXmatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5, rotateYmatrix, "rotateYmatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5*2, rotateZmatrix, "rotateZmatrix");
+		MatrixScreenPrintf(0, kRowHeight * 5*3, rotateXYZmatrix, "rotateXYZmatrix");
 
 		///
 		/// ↑描画処理ここまで
