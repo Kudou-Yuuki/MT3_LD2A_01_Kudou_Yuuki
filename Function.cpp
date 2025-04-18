@@ -31,8 +31,8 @@ Matrix4x4 MakePrespectiveMatrix(float fovY, float aspectRatio, float nearClip, f
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result{};
 	result.m[0][0] = 2.0f / (right - left);
-	result.m[1][1] = 2.0f / (top - bottom);       // ← DirectXならここが正しい
-	result.m[2][2] = 1.0f / (farClip - nearClip); // ← Z奥行き
+	result.m[1][1] = 2.0f / (top - bottom);      
+	result.m[2][2] = 1.0f / (farClip - nearClip); 
 	result.m[3][0] = -(right + left) / (right - left);
 	result.m[3][1] = -(top + bottom) / (top - bottom);
 	result.m[3][2] = -nearClip / (farClip - nearClip);
