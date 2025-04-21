@@ -21,7 +21,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char preKeys[256] = {0};
 
 
-	Vector3 cameraPosition = {0.0f, 0.0f, 0.0f};
+	Vector3 cameraPosition = {0.0f, 1.9f, -6.49f};
+	Vector3 cameraRotate = {0.26f, 0.0f, 0.0f};
 
 	Vector3 v1 = {1.2f, -3.9f, 2.5f};
 	Vector3 v2 = {2.8f, 0.4f, -1.3f};
@@ -91,6 +92,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
+		/// 
+	
+		
+		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
+		
 		Novice::DrawTriangle(
 		    int(ScreenVertices[0].x), int(ScreenVertices[0].y), int(ScreenVertices[1].x), int(ScreenVertices[1].y), int(ScreenVertices[2].x), int(ScreenVertices[2].y), RED, kFillModeSolid);
 

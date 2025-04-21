@@ -52,6 +52,40 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 	result.m[3][3] = 1.0f;
 	return result;
 }
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, const Vector3& cameraPosition) {
+	const float kGridHalfWhidth = 2.0f;
+	const uint32_t kSubdvision = 10;
+	const float kGridEvery = (kGridHalfWhidth * 2.0f) / float(kSubdvision);
+
+	for (uint32_t xIndex = 0; xIndex <= kSubdvision; ++xIndex) {
+		float offset = -kGridHalfWhidth + kGridEvery * float(xIndex);
+		Vector3 start = {-kGridHalfWhidth, 0.0f, offset};
+		Vector3 end = {kGridHalfWhidth, 0.0f, offset};
+		Vector3 ndcStart = Transform(start, viewProjectionMatrix);
+		Vector3 ndcEnd = Transform(end, viewProjectionMatrix);
+		Vector3 startScreen = Transform(ndcStart, viewportMatrix);
+		Vector3 endScreen = Transform(ndcEnd, viewportMatrix);
+		Novice::DrawLine((int)startScreen.x, (int)startScreen.y, (int)endScreen.x, (int)endScreen.y, 0xFFFFFFFF);
+	}
+
+	for (uint32_t zIndex = 0; zIndex <= kSubdvision; ++zIndex) {
+		float offset = -kGridHalfWhidth + kGridEvery * float(zIndex);
+		Vector3 start = {offset, 0.0f, -kGridHalfWhidth};
+		Vector3 end = {offset, 0.0f, kGridHalfWhidth};
+		Vector3 ndcStart = Transform(start, viewProjectionMatrix);
+		Vector3 ndcEnd = Transform(end, viewProjectionMatrix);
+		Vector3 startScreen = Transform(ndcStart, viewportMatrix);
+		Vector3 endScreen = Transform(ndcEnd, viewportMatrix);
+		Novice::DrawLine((int)startScreen.x, (int)startScreen.y, (int)endScreen.x, (int)endScreen.y, 0xFFFFFFFF);
+	}
+
+	Vector3 cameraPositionScreen = Transform(cameraPosition, viewProjectionMatrix);
+}
+
+
+
+
+
 
 Matrix4x4 MakeTrancelateMatrix(Vector3 translate) {
 	Matrix4x4 result{};

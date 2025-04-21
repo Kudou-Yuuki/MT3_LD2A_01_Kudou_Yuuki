@@ -23,3 +23,6 @@ Matrix4x4 MakePrespectiveMatrix(float fovY, float aspectRatio, float nearClip, f
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip);
 
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
+
+//void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Vector3& cameraPosition, uint32_t color);
+void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, const Vector3& cameraPosition);
