@@ -105,7 +105,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawSphere(sphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, 0xFFFFFFFF);
 		
 	
-	ImGui::Begin("Hello, world!");
+	ImGui::Begin("Window");
 	ImGui::DragFloat3("CameraPosition", &cameraPosition.x, 0.1f);
 	ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.1f);
 	ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.1f);
