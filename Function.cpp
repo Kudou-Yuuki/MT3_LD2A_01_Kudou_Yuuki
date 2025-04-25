@@ -2,6 +2,7 @@
 #include <Novice.h>
 #include <cmath>
 #include <cassert>
+#define M_PI 3.14159265358979323846
 
 static const int kColumnWidth = 60;
 static const int kRowHeight = 30;
@@ -189,10 +190,16 @@ Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix4x4) {
 	result.y = vector.x * matrix4x4.m[0][1] + vector.y * matrix4x4.m[1][1] + vector.z * matrix4x4.m[2][1] + matrix4x4.m[3][1];
 	result.z = vector.x * matrix4x4.m[0][2] + vector.y * matrix4x4.m[1][2] + vector.z * matrix4x4.m[2][2] + matrix4x4.m[3][2];
 	float w = vector.x * matrix4x4.m[0][3] + vector.y * matrix4x4.m[1][3] + vector.z * matrix4x4.m[2][3] + matrix4x4.m[3][3];
-	assert(w != 0);
-	result.x = result.x / w;
-	result.y = result.y / w;
-	result.z = result.z / w;
+
+	// wが0なら変換できない（カメラの視野外など）
+	if (w != 0.0f) {
+		result.x /= w;
+		result.y /= w;
+		result.z /= w;
+	} else {
+		// 代替処理（例：そのまま返す・0で埋める・巨大な数を入れるなど）
+		result = {0.0f, 0.0f, 0.0f}; // 安全に落とす場合
+	}
 
 	return result;
 }
@@ -246,4 +253,38 @@ Matrix4x4 Inverse(const Matrix4x4& m) {
 	    (m.m[0][0] * (m.m[1][1] * m.m[2][2] - m.m[1][2] * m.m[2][1]) - m.m[0][1] * (m.m[1][0] * m.m[2][2] - m.m[1][2] * m.m[2][0]) + m.m[0][2] * (m.m[1][0] * m.m[2][1] - m.m[1][1] * m.m[2][0])) / d;
 
 	return i;
+}
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+	const uint32_t kSubdivision = 20;
+	const float kLonEvery = 2.0f * float(M_PI) / float(kSubdivision);
+	const float kLatEvery = float(M_PI) / float(kSubdivision);
+
+	for (uint32_t latIndex = 0; latIndex < kSubdivision; ++latIndex) {
+		float lat = -float(M_PI) / 2.0f + kLatEvery * latIndex;
+		float latNext = lat + kLatEvery;
+
+		for (uint32_t lonIndex = 0; lonIndex < kSubdivision; ++lonIndex) {
+			float lon = kLonEvery * lonIndex;
+			float lonNext = lon + kLonEvery;
+
+		
+			Vector3 a = {
+			    sphere.center.x + sphere.radius * std::cosf(lat) * std::cosf(lon), sphere.center.y + sphere.radius * std::sinf(lat), sphere.center.z + sphere.radius * std::cosf(lat) * std::sinf(lon)};
+			Vector3 b = {
+			    sphere.center.x + sphere.radius * std::cosf(lat) * std::cosf(lonNext), sphere.center.y + sphere.radius * std::sinf(lat),
+			    sphere.center.z + sphere.radius * std::cosf(lat) * std::sinf(lonNext)};
+			Vector3 c = {
+			    sphere.center.x + sphere.radius * std::cosf(latNext) * std::cosf(lon), sphere.center.y + sphere.radius * std::sinf(latNext),
+			    sphere.center.z + sphere.radius * std::cosf(latNext) * std::sinf(lon)};
+
+			Vector3 screenA = Transform(Transform(a, viewProjectionMatrix), viewPortMatrix);
+			Vector3 screenB = Transform(Transform(b, viewProjectionMatrix), viewPortMatrix);
+			Vector3 screenC = Transform(Transform(c, viewProjectionMatrix), viewPortMatrix);
+
+			
+			Novice::DrawLine(int(screenA.x), int(screenA.y), int(screenB.x), int(screenB.y), color);
+			Novice::DrawLine(int(screenB.x), int(screenB.y), int(screenC.x), int(screenC.y), color);
+			Novice::DrawLine(int(screenC.x), int(screenC.y), int(screenA.x), int(screenA.y), color);
+		}
+	}
 }

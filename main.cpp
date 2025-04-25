@@ -3,6 +3,7 @@
 #include "Function.h"
 #include <Novice.h>
 #include <cstdint>
+#include <imgui.h>
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
 
 static const int kColumnWidth = 60;
@@ -20,8 +21,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-
-	Vector3 cameraPosition = {0.0f, 1.9f, -6.49f};
+		Sphere sphere = {
+	    {0.0f, 1.0f, 0.0f},
+        1.0f
+    };
+		
+	Vector3 cameraPosition = {0.0f, 1.9f, -10.0f};
 	Vector3 cameraRotate = {0.26f, 0.0f, 0.0f};
 
 	Vector3 v1 = {1.2f, -3.9f, 2.5f};
@@ -39,7 +44,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    {0.5f,  -0.5f, 0.0f}, // 頂点2
 	    {-0.5f, -0.5f, 0.0f}  // 頂点3
 	};
-		
+
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -70,21 +76,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
        
 		if (keys[DIK_W]) {
-			translate.z -= 0.1f;
+			cameraPosition.z -= 0.1f;
 		}
 
 		if (keys[DIK_S]) {
-			translate.z += 0.1f;
+			cameraPosition.z += 0.1f;
 		}
 		if (keys[DIK_A]) {
-			translate.x += 0.1f;
+			cameraPosition.x += 0.1f;
 		}
 		if (keys[DIK_D]) {
-			translate.x -= 0.1f;
+			cameraPosition.x -= 0.1f;
 		}
 
-		rotate.y += 0.01f;
-
+		
 		///
 		/// ↑更新処理ここまで
 		///
@@ -97,11 +102,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 		
-		Novice::DrawTriangle(
-		    int(ScreenVertices[0].x), int(ScreenVertices[0].y), int(ScreenVertices[1].x), int(ScreenVertices[1].y), int(ScreenVertices[2].x), int(ScreenVertices[2].y), RED, kFillModeSolid);
-
-
+		DrawSphere(sphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, 0xFFFFFFFF);
+		
 	
+	ImGui::Begin("Hello, world!");
+	ImGui::DragFloat3("CameraPosition", &cameraPosition.x, 0.1f);
+	ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.1f);
+	ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.1f);
+	ImGui::DragFloat("SphereRadius", &sphere.radius, 0.1f);
+	ImGui::End();
+
+
 	
 		///
 		/// ↑描画処理ここまで

@@ -2,6 +2,12 @@
 #pragma once
 #include "../DirectXGame/math/Matrix4x4.h"
 #include "../DirectXGame/math/Vector3.h"
+#include <cstdint>
+struct Sphere {
+	Vector3 center;
+	float radius;
+
+};
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
@@ -26,3 +32,5 @@ Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, f
 
 //void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Vector3& cameraPosition, uint32_t color);
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, const Vector3& cameraPosition);
+
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
