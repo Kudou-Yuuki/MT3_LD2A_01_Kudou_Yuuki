@@ -53,3 +53,5 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
 Vector3 Add(const Vector3& v1, const Vector3& v2);
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
+
+bool IsCollision(const Sphere& sphere1, const Sphere& sphere2);

@@ -291,6 +291,17 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 Vector3 Add(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
 
 Vector3 Subtract(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
+bool IsCollision(const Sphere& sphere1, const Sphere& sphere2) { 
+
+	float distanceSquared =
+		(sphere1.center.x - sphere2.center.x) * (sphere1.center.x - sphere2.center.x) + 
+		(sphere1.center.y - sphere2.center.y) * (sphere1.center.y - sphere2.center.y) +
+	    (sphere1.center.z - sphere2.center.z) * (sphere1.center.z - sphere2.center.z);
+	float radiusSum = sphere1.radius + sphere2.radius;
+	return distanceSquared <= radiusSum * radiusSum;
+}
+
+
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	float dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 	float lengthSquared = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
