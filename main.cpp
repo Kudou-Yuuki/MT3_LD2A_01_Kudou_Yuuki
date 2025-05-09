@@ -21,21 +21,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-		Sphere sphere = {
+	Sphere sphere = {
 	    {0.0f, 1.0f, 0.0f},
         1.0f
     };
-		
+
+	Segment segment = {
+	    {-2.0f, -1.0f, 0.0f},
+        {3.0f,  2.0f,  2.0f}
+    };
+
+	Vector3 point{-1.5f, 0.6f, 0.6f};
+	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
+	Vector3 closestPoint = ClosestPoint(point, segment);
+
+	Sphere pointSphere = {point, 0.01f};
+
+	Sphere closestPointSphere = {closestPoint, 0.01f};
+
 	Vector3 cameraPosition = {0.0f, 1.9f, -10.0f};
 	Vector3 cameraRotate = {0.26f, 0.0f, 0.0f};
 
 	Vector3 v1 = {1.2f, -3.9f, 2.5f};
 	Vector3 v2 = {2.8f, 0.4f, -1.3f};
 	Vector3 cross = Cross(v1, v2);
-	
+
 	Vector3 rotate{0.0f, 0.0f, 0.0f};
 	Vector3 translate = {0.0f, 0.0f, 3.0f};
-
 
 	Vector3 ScreenVertices[3];
 
@@ -44,7 +56,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    {0.5f,  -0.5f, 0.0f}, // 頂点2
 	    {-0.5f, -0.5f, 0.0f}  // 頂点3
 	};
-
 
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
@@ -59,22 +70,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 
-	VectorScreenPrintf(0, 0, cross, "cross");
+		VectorScreenPrintf(0, 0, cross, "cross");
 
-		
-	Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
-	Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, cameraPosition);
-	Matrix4x4 viewMatrix = Inverse(cameraMatrix);
-	Matrix4x4 projectionMatrix = MakePrespectiveMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
-	Matrix4x4 WorldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
-	Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
+		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
+		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, cameraPosition);
+		Matrix4x4 viewMatrix = Inverse(cameraMatrix);
+		Matrix4x4 projectionMatrix = MakePrespectiveMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
+		Matrix4x4 WorldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
+		Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
 
-		for (uint32_t i = 0; i < 3; ++i){
+		for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], WorldViewProjectionMatrix);
-			ScreenVertices[i] = Transform(ndcVertex,viewportMatrix);
-			
+			ScreenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}
-       
+
 		if (keys[DIK_W]) {
 			cameraPosition.z -= 0.1f;
 		}
@@ -89,7 +98,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			cameraPosition.x -= 0.1f;
 		}
 
-		
+		Vector3 start = Transform(Transform(segment.origin, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
+		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
+	
 		///
 		/// ↑更新処理ここまで
 		///
@@ -97,23 +108,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 		/// ↓描画処理ここから
 		///
-		/// 
-	
-		
+		///
+
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
-		
-		DrawSphere(sphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, 0xFFFFFFFF);
-		
-	
-	ImGui::Begin("Window");
-	ImGui::DragFloat3("CameraPosition", &cameraPosition.x, 0.1f);
-	ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.1f);
-	ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.1f);
-	ImGui::DragFloat("SphereRadius", &sphere.radius, 0.1f);
-	ImGui::End();
 
+		Novice::DrawLine(int(start.x), int(start.y), int(end.x), int(end.y), WHITE);	
+		DrawSphere(pointSphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
+		DrawSphere(closestPointSphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, BLACK);
 
-	
+		ImGui::Begin("Hello, world!");
+		ImGui::DragFloat3("CameraPosition", &cameraPosition.x, 0.1f);
+		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.1f);
+		ImGui::DragFloat3("SphereCenter", &pointSphere.center.x, 0.1f);
+		ImGui::DragFloat3("SphereCenter", &closestPointSphere.center.x, 0.1f);
+		ImGui::DragFloat("SphereRadius", &pointSphere.radius, 0.1f);
+		ImGui::DragFloat("SphereRadius", &closestPointSphere.radius, 0.1f);
+		ImGui::End();
+
 		///
 		/// ↑描画処理ここまで
 		///

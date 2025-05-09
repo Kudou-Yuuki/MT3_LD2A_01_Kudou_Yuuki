@@ -287,3 +287,29 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, con
 		}
 	}
 }
+
+Vector3 Add(const Vector3& v1, const Vector3& v2) { return {v1.x + v2.x, v1.y + v2.y, v1.z + v2.z}; }
+
+Vector3 Subtract(const Vector3& v1, const Vector3& v2) { return {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z}; }
+Vector3 Project(const Vector3& v1, const Vector3& v2) {
+	float dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+	float lengthSquared = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
+	if (lengthSquared == 0.0f) {
+		return {0.0f, 0.0f, 0.0f}; // Avoid division by zero
+	}
+	float scale = dot / lengthSquared;
+	return {v2.x * scale, v2.y * scale, v2.z * scale};
+}
+
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
+	Vector3 segmentToPoint = Subtract(point, segment.origin);
+	float t = (segmentToPoint.x * segment.diff.x + segmentToPoint.y * segment.diff.y + segmentToPoint.z * segment.diff.z) /
+	          (segment.diff.x * segment.diff.x + segment.diff.y * segment.diff.y + segment.diff.z * segment.diff.z);
+	if (t < 0.0f) {
+		return segment.origin; // Closest point is the start of the segment
+	} else if (t > 1.0f) {
+		return Add(segment.origin, segment.diff); // Closest point is the end of the segment
+	} else {
+		return Add(segment.origin, {segment.diff.x * t, segment.diff.y * t, segment.diff.z * t}); // Closest point is within the segment
+	}
+}

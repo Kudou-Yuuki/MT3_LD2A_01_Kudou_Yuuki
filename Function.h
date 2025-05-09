@@ -3,14 +3,28 @@
 #include "../DirectXGame/math/Matrix4x4.h"
 #include "../DirectXGame/math/Vector3.h"
 #include <cstdint>
+
 struct Sphere {
 	Vector3 center;
 	float radius;
+};
 
+struct Line {
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Ray {
+	Vector3 origin;
+	Vector3 diff;
+};
+
+struct Segment {
+	Vector3 origin;
+	Vector3 diff;
 };
 
 void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
-
 
 Matrix4x4 MakeRotateXMatrix(float radian);
 Matrix4x4 MakeRotateYMatrix(float radian);
@@ -22,6 +36,7 @@ void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 Vector3 Transform(const Vector3& vector, const Matrix4x4& matrix4x4);
 Matrix4x4 Inverse(const Matrix4x4& m);
 
+Vector3 Subtract(const Vector3& v1, const Vector3& v2); // Add this overload for Vector3 subtraction
 Matrix4x4 MakeAffineMatrix(Vector3 scale, Vector3 rotate, Vector3 translate);
 
 Matrix4x4 MakePrespectiveMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
@@ -30,7 +45,11 @@ Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float botto
 
 Matrix4x4 MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth);
 
-//void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Vector3& cameraPosition, uint32_t color);
 void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMatrix, const Vector3& cameraPosition);
 
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
+Vector3 Project(const Vector3& vector, const Vector3& normal);
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
+
+Vector3 Add(const Vector3& v1, const Vector3& v2);
+Vector3 Subtract(const Vector3& v1, const Vector3& v2);
