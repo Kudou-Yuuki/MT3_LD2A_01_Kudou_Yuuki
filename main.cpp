@@ -4,6 +4,7 @@
 #include <Novice.h>
 #include <cstdint>
 #include <imgui.h>
+#include <corecrt_math.h>
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
 
 static const int kColumnWidth = 60;
@@ -50,6 +51,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 translate = {0.0f, 0.0f, 3.0f};
 
 	Vector3 ScreenVertices[3];
+
 
 	int color = RED;
 
@@ -112,54 +114,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], WorldViewProjectionMatrix);
 			ScreenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}
-		if (cameraRotate.y < 1 && cameraRotate.y > -1) {
+		Vector3 localMove = {0.0f, 0.0f, 0.0f};
+		if (Novice::CheckHitKey(DIK_W))
+			localMove.z += 1.0f; // 前
+		if (Novice::CheckHitKey(DIK_S))
+			localMove.z -= 1.0f; // 後
+		if (Novice::CheckHitKey(DIK_A))
+			localMove.x -= 1.0f; // 左
+		if (Novice::CheckHitKey(DIK_D))
+			localMove.x += 1.0f; // 右
 
-			if (keys[DIK_W]) {
-				cameraPosition.z += 0.1f;
-			}
-
-			if (keys[DIK_S]) {
-				cameraPosition.z -= 0.1f;
-			}
-			if (keys[DIK_A]) {
-				cameraPosition.x -= 0.1f;
-			}
-			if (keys[DIK_D]) {
-				cameraPosition.x += 0.1f;
-			}
+		// 正規化（斜め移動調整）
+		float len = sqrtf(localMove.x * localMove.x + localMove.z * localMove.z);
+		if (len > 0.0f) {
+			localMove.x /= len;
+			localMove.z /= len;
 		}
-		if (cameraRotate.y > 1) {
-		
-			if (keys[DIK_A]) {
-				cameraPosition.z += 0.1f;
-			}
 
-			if (keys[DIK_D]) {
-				cameraPosition.z -= 0.1f;
-			}
-			if (keys[DIK_W]) {
-				cameraPosition.x -= 0.1f;
-			}
-			if (keys[DIK_S]) {
-				cameraPosition.x += 0.1f;
-			}
-		}
-		if (cameraRotate.y < -1) {
+		// カメラの向きに合わせたワールド座標変換
+		Vector3 forward = {sinf(cameraRotate.y), 0.0f, cosf(cameraRotate.y)};
+		Vector3 right = {cosf(cameraRotate.y), 0.0f, -sinf(cameraRotate.y)};
 
-			if (keys[DIK_D]) {
-				cameraPosition.z += 0.1f;
-			}
+		// カメラ向きに応じて移動
+		Vector3 move = {right.x * localMove.x + forward.x * localMove.z, 0.0f, right.z * localMove.x + forward.z * localMove.z};
 
-			if (keys[DIK_A]) {
-				cameraPosition.z -= 0.1f;
-			}
-			if (keys[DIK_W]) {
-				cameraPosition.x -= 0.1f;
-			}
-			if (keys[DIK_S]) {
-				cameraPosition.x += 0.1f;
-			}
-		}
+		// 実際に移動
+		cameraPosition.x += move.x * 0.05f;
+		cameraPosition.z += move.z * 0.05f;
 
 		Vector3 start = Transform(Transform(segment.origin, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
@@ -211,6 +192,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 
 
+		Novice::ScreenPrintf(0, 0, "Move : WASD");
+		Novice::ScreenPrintf(0, 20, "RGIHT CLICK : LotateY");
+		Novice::ScreenPrintf(0, 40, "LEFT  CLICK : LotateZ");
 
 
 

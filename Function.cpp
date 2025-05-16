@@ -154,6 +154,14 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return result;
 }
 
+Vector3 Multiply(Vector3& a, float& w) { 
+	Vector3 result;
+	result.x = a.x * w;
+	result.y = a.y * w;
+	result.z = a.z * w;
+	return result;
+}
+
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 
 	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);

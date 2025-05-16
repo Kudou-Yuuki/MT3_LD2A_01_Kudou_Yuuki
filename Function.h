@@ -30,6 +30,9 @@ Matrix4x4 MakeRotateXMatrix(float radian);
 Matrix4x4 MakeRotateYMatrix(float radian);
 Matrix4x4 MakeRotateZMatrix(float radian);
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
+
+Vector3 Multiply(Vector3 &a, float &w);
+
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
 
