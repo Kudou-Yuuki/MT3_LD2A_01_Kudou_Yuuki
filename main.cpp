@@ -26,7 +26,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    {0.0f, 0.0f, 0.0f},
         1.0f
     };
+	Plane plane = {
+	    {0.2f, 0.2f, 0.2f},
+        1.0f
 
+
+    };
 	Segment segment = {
 	    {0.0f, 0.0f, 0.0f},
         1.0f
@@ -36,7 +41,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
 	Vector3 closestPoint = ClosestPoint(point, segment);
 
-	Sphere pointSphere = {point, 0.01f};
+
+
+	Sphere pointSphere = {point, 1.0f};
 
 	Sphere closestPointSphere = {closestPoint, 0.01f};
 
@@ -51,6 +58,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 translate = {0.0f, 0.0f, 3.0f};
 
 	Vector3 ScreenVertices[3];
+
 
 
 	int color = RED;
@@ -87,17 +95,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↓更新処理ここから
 		///
 		Novice::GetMousePosition(&mouseX, &mouseY);
-		if (Novice::IsPressMouse(0)==1) {
-			mouseMoveX = mouseX - prevMouseX;
-		} else {
-			mouseMoveX = 0;
-		}
-		if (Novice::IsPressMouse(1) == 1) {
-			mouseMoveY = mouseY - prevMouseY;
-		} else {
-			mouseMoveY = 0;
-		}
+		if (keys[DIK_SPACE]) {
 
+			if (Novice::IsPressMouse(0) == 1) {
+				mouseMoveX = mouseX - prevMouseX;
+			} else {
+				mouseMoveX = 0;
+			}
+			if (Novice::IsPressMouse(1) == 1) {
+				mouseMoveY = mouseY - prevMouseY;
+			} else {
+				mouseMoveY = 0;
+			}
+		}
 		VectorScreenPrintf(0, 0, cross, "cross");
 		cameraRotate.y += mouseMoveX * sensitivity; // Y軸回転を更新
 		cameraRotate.x += mouseMoveY * sensitivity; // Y軸回転を更新
@@ -145,7 +155,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 start = Transform(Transform(segment.origin, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 	
-		if (IsCollision(pointSphere, closestPointSphere)) {
+		if (IsCollision(pointSphere, plane)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -172,7 +182,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		/// ↑更新処理ここまで
 		///
 
-		///
+		///Multiply
 		/// ↓描画処理ここから
 		///
 		///
@@ -180,8 +190,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 
 		DrawSphere(pointSphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		DrawSphere(closestPointSphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
-
+		
+		DrawPlane(plane, Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
+	
 		ImGui::Begin("Hello, world!");
 		ImGui::DragFloat3("CameraPosition", &cameraPosition.x, 0.1f);
 		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.1f);
@@ -189,8 +200,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("closestPointSphere", &closestPointSphere.center.x, 0.1f);
 		ImGui::DragFloat("SphereRadius", &pointSphere.radius, 0.1f);
 		ImGui::DragFloat("SphereRadius", &closestPointSphere.radius, 0.1f);
+		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		
 		ImGui::End();
-
+		plane.normal = Normalize(plane.normal);
 
 		Novice::ScreenPrintf(0, 0, "Move : WASD");
 		Novice::ScreenPrintf(0, 20, "RGIHT CLICK : LotateY");

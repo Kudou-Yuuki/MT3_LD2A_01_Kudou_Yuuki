@@ -154,14 +154,14 @@ Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2) {
 	return result;
 }
 
-Vector3 Multiply(Vector3& a, float& w) { 
+Vector3 Multiply2(Vector3& a, float& w) { 
 	Vector3 result;
 	result.x = a.x * w;
 	result.y = a.y * w;
 	result.z = a.z * w;
 	return result;
 }
-
+Vector3 Multiply(const Vector3& vector, float scalar) { return {vector.x * scalar, vector.y * scalar, vector.z * scalar}; }
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label) {
 
 	Novice::ScreenPrintf(x, y, "%0.2f", vector.x);
@@ -309,6 +309,79 @@ bool IsCollision(const Sphere& sphere1, const Sphere& sphere2) {
 	return distanceSquared <= radiusSum * radiusSum;
 }
 
+bool IsCollision(const Sphere& sphere1, const Plane& plane) { 
+	
+	float distance = plane.normal.x * sphere1.center.x + plane.normal.y * sphere1.center.y + plane.normal.z * sphere1.center.z - plane.distance;
+	return std::abs(distance) <= sphere1.radius;
+
+
+}
+
+Vector3 Perpendicular(const Vector3& v1) { 
+
+	Vector3 result;
+	if (v1.x != 0.0f || v1.y != 0.0f) {
+		result.x = -v1.y;
+		result.y = v1.x;
+		result.z = 0.0f;
+	} else {
+		result.x = 0.0f;
+		result.y = -v1.z;
+		result.z = v1.y;
+	}
+	return result;
+
+
+}
+Vector3 Normalize(const Vector3& vector) { 
+
+	float length = std::sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z);
+	if (length == 0.0f) {
+		return {0.0f, 0.0f, 0.0f}; // Avoid division by zero
+	}
+	return {vector.x / length, vector.y / length, vector.z / length};
+
+
+}
+Vector3 Multiply(float scalar, const Vector3& vector) { return {vector.x * scalar, vector.y * scalar, vector.z * scalar}; }
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+	// 平面の中心位置
+	Vector3 center = Multiply(plane.normal, plane.distance);
+
+	// u, vを計算
+	Vector3 u = Perpendicular(plane.normal);
+	Vector3 v = Cross(plane.normal, u);
+
+	// 正規化（Normalizeなしなので手動で）
+	float uLen = sqrtf(u.x * u.x + u.y * u.y + u.z * u.z);
+	float vLen = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+	u = Multiply(1.0f / uLen, u);
+	v = Multiply(1.0f / vLen, v);
+
+	// サイズをかける
+	float size = 2.0f;
+	u = Multiply(size, u);
+	v = Multiply(size, v);
+
+	// 4つの頂点を作る
+	Vector3 points[4];
+	points[0] = Add(center, Add(u, v));                       // +u +v
+	points[1] = Add(center, Subtract(u, v));                  // +u -v
+	points[2] = Add(center, Subtract(Multiply(-1.0f, u), v)); // -u -v
+	points[3] = Add(center, Add(Multiply(-1.0f, u), v));      // -u +v
+
+	// 変換
+	for (int i = 0; i < 4; ++i) {
+		points[i] = Transform(Transform(points[i], viewProjectionMatrix), viewPortMatrix);
+	}
+
+	// 線描画（矩形になるように順に繋ぐ）
+	for (int i = 0; i < 4; ++i) {
+		int next = (i + 1) % 4;
+		Novice::DrawLine((int)points[i].x, (int)points[i].y, (int)points[next].x, (int)points[next].y, color);
+	}
+}
 
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	float dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;

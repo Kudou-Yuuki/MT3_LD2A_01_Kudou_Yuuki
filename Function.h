@@ -8,7 +8,10 @@ struct Sphere {
 	Vector3 center;
 	float radius;
 };
-
+struct Plane {
+	Vector3 normal;
+	float distance;
+};
 struct Line {
 	Vector3 origin;
 	Vector3 diff;
@@ -31,7 +34,8 @@ Matrix4x4 MakeRotateYMatrix(float radian);
 Matrix4x4 MakeRotateZMatrix(float radian);
 Matrix4x4 Multiply(const Matrix4x4& m1, const Matrix4x4& m2);
 
-Vector3 Multiply(Vector3 &a, float &w);
+Vector3 Multiply2(Vector3& a, float& w);
+Vector3 Multiply(const Vector3& vector, float scalar);
 
 Vector3 Cross(const Vector3& v1, const Vector3& v2);
 void VectorScreenPrintf(int x, int y, const Vector3& vector, const char* label);
@@ -58,3 +62,10 @@ Vector3 Add(const Vector3& v1, const Vector3& v2);
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
 bool IsCollision(const Sphere& sphere1, const Sphere& sphere2);
+bool IsCollision(const Sphere& sphere1, const Plane& plane);
+
+Vector3 Perpendicular(const Vector3& v1);
+
+Vector3 Normalize(const Vector3& vector);
+
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
