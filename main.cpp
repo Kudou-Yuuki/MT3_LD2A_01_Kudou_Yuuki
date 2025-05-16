@@ -33,8 +33,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     };
 	Segment segment = {
-	    {0.0f, 0.0f, 0.0f},
-        1.0f
+	    {-2.0f, -1.0f, 0.0f},
+        {3.0f,2.0f,2.0f,}
     };
 
 	Vector3 point{-1.5f, 0.6f, 0.6f};
@@ -154,8 +154,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		Vector3 start = Transform(Transform(segment.origin, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
-	
-		if (IsCollision(pointSphere, plane)) {
+		plane.normal = Normalize(plane.normal);
+
+		if (IsCollision(segment, plane)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -188,14 +189,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
-
-		DrawSphere(pointSphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		
+		Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, color);
 		DrawPlane(plane, Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
 	
 		ImGui::Begin("Hello, world!");
-		ImGui::DragFloat3("CameraPosition", &cameraPosition.x, 0.1f);
-		ImGui::DragFloat3("CameraRotate", &cameraRotate.x, 0.1f);
+		ImGui::DragFloat3("Planee.Normal", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Plaqqne.Normal", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("Planeermal", &cameraPosition.x, 0.01f);
+		ImGui::DragFloat3("Plae.Normal", &cameraRotate.x, 0.01f);
+	
 		ImGui::DragFloat3("pointSphere", &pointSphere.center.x, 0.1f);
 		ImGui::DragFloat3("closestPointSphere", &closestPointSphere.center.x, 0.1f);
 		ImGui::DragFloat("SphereRadius", &pointSphere.radius, 0.1f);
@@ -203,8 +205,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
 		
 		ImGui::End();
-		plane.normal = Normalize(plane.normal);
-
+		
 		Novice::ScreenPrintf(0, 0, "Move : WASD");
 		Novice::ScreenPrintf(0, 20, "RGIHT CLICK : LotateY");
 		Novice::ScreenPrintf(0, 40, "LEFT  CLICK : LotateZ");

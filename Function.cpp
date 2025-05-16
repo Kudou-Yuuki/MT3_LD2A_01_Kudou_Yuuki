@@ -316,7 +316,26 @@ bool IsCollision(const Sphere& sphere1, const Plane& plane) {
 
 
 }
+float Dot(const Vector3& a, const Vector3& b) { return a.x * b.x + a.y * b.y + a.z * b.z; }
+bool IsCollision(const Segment& segment, const Plane& plane) {
+	Vector3 n = Normalize(plane.normal);
 
+	float distStart = Dot(n, segment.origin) - plane.distance;
+
+	Vector3 endPoint = {segment.origin.x + segment.diff.x, segment.origin.y + segment.diff.y, segment.origin.z + segment.diff.z};
+	float distEnd = Dot(n, endPoint) - plane.distance;
+
+	const float epsilon = 1e-6f;
+	if (std::abs(distStart) < epsilon || std::abs(distEnd) < epsilon) {
+		return true;
+	}
+
+	if (distStart * distEnd < 0.0f) {
+		return true;
+	}
+
+	return false;
+}
 Vector3 Perpendicular(const Vector3& v1) { 
 
 	Vector3 result;

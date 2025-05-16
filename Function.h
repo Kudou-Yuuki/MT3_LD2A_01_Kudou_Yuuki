@@ -63,9 +63,10 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
 bool IsCollision(const Sphere& sphere1, const Sphere& sphere2);
 bool IsCollision(const Sphere& sphere1, const Plane& plane);
+bool IsCollision(const Segment& segment, const Plane& plane);
 
 Vector3 Perpendicular(const Vector3& v1);
-
+float Dot(const Vector3& a, const Vector3& b);
 Vector3 Normalize(const Vector3& vector);
 
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
