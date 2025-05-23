@@ -402,6 +402,8 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 	}
 }
 
+
+
 Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	float dot = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
 	float lengthSquared = v2.x * v2.x + v2.y * v2.y + v2.z * v2.z;
@@ -422,5 +424,57 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 		return Add(segment.origin, segment.diff); // Closest point is the end of the segment
 	} else {
 		return Add(segment.origin, {segment.diff.x * t, segment.diff.y * t, segment.diff.z * t}); // Closest point is within the segment
+	}
+}
+Vector3 Multiply(const Vector3 vector1, const Vector3& vector2) {
+	Vector3 result;
+	result.x = vector1.x * vector2.x;
+	result.y = vector1.y * vector2.y;
+	result.z = vector1.z * vector2.z;
+	return result;
+
+}
+bool IsCollision(const Triangle& triangle, const Segment& segment) {
+	const Vector3& v0 = triangle.vertices[0];
+	const Vector3& v1 = triangle.vertices[1];
+	const Vector3& v2 = triangle.vertices[2];
+
+	Vector3 edge1 = Subtract(v1, v0);
+	Vector3 edge2 = Subtract(v2, v0);
+	Vector3 dir = segment.diff; // ✅ 正しく方向ベクトルを取得
+	Vector3 pvec = Cross(dir, edge2);
+	float det = Dot(edge1, pvec);
+
+	if (fabsf(det) < 1e-6f)
+		return false; // 平行
+
+	float invDet = 1.0f / det;
+	Vector3 tvec = Subtract(segment.origin, v0);
+	float u = Dot(tvec, pvec) * invDet;
+	if (u < 0.0f || u > 1.0f)
+		return false;
+
+	Vector3 qvec = Cross(tvec, edge1);
+	float v = Dot(dir, qvec) * invDet;
+	if (v < 0.0f || u + v > 1.0f)
+		return false;
+
+	float t = Dot(edge2, qvec) * invDet;
+
+	if (t < 0.0f || t > 1.0f)
+		return false;
+
+	return true;
+}
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+
+	Vector3 screenVertices[3];
+	for (int i = 0; i < 3; ++i) {
+		screenVertices[i] = Transform(Transform(triangle.vertices[i], viewProjectionMatrix), viewPortMatrix);
+	}
+	// 三角形の辺を描画
+	for (int i = 0; i < 3; ++i) {
+		int next = (i + 1) % 3;
+		Novice::DrawLine((int)screenVertices[i].x, (int)screenVertices[i].y, (int)screenVertices[next].x, (int)screenVertices[next].y, color);
 	}
 }

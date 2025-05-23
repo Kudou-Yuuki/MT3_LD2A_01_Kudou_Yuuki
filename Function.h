@@ -27,7 +27,12 @@ struct Segment {
 	Vector3 diff;
 };
 
-void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
+struct Triangle {
+	Vector3 vertices[3];
+};
+Vector3 Multiply(const Vector3 vector1, const Vector3& vector2);
+
+	void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
 
 Matrix4x4 MakeRotateXMatrix(float radian);
 Matrix4x4 MakeRotateYMatrix(float radian);
@@ -64,9 +69,13 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 bool IsCollision(const Sphere& sphere1, const Sphere& sphere2);
 bool IsCollision(const Sphere& sphere1, const Plane& plane);
 bool IsCollision(const Segment& segment, const Plane& plane);
+bool IsCollision(const Triangle&triangle , const Segment& segment);
 
 Vector3 Perpendicular(const Vector3& v1);
 float Dot(const Vector3& a, const Vector3& b);
 Vector3 Normalize(const Vector3& vector);
 
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
+
+
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);

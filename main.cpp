@@ -37,6 +37,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {3.0f,2.0f,2.0f,}
     };
 
+	Triangle triangle = {
+	    {{-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}
+    };
+
 	Vector3 point{-1.5f, 0.6f, 0.6f};
 	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
 	Vector3 closestPoint = ClosestPoint(point, segment);
@@ -156,7 +160,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		plane.normal = Normalize(plane.normal);
 
-		if (IsCollision(segment, plane)) {
+		if (IsCollision(triangle,segment)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -190,19 +194,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 		Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, color);
-		DrawPlane(plane, Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
-	
+		DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
 		ImGui::Begin("Hello, world!");
-		ImGui::DragFloat3("Planee.Normal", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("Plaqqne.Normal", &segment.diff.x, 0.01f);
-		ImGui::DragFloat3("Planeermal", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("Plae.Normal", &cameraRotate.x, 0.01f);
 	
-		ImGui::DragFloat3("pointSphere", &pointSphere.center.x, 0.1f);
-		ImGui::DragFloat3("closestPointSphere", &closestPointSphere.center.x, 0.1f);
-		ImGui::DragFloat("SphereRadius", &pointSphere.radius, 0.1f);
-		ImGui::DragFloat("SphereRadius", &closestPointSphere.radius, 0.1f);
-		ImGui::DragFloat3("Plane.Normal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
+		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
+	
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
+	
+		ImGui::DragFloat3("vertices[0]", &triangle.vertices[0].x, 0.01f);
+		ImGui::DragFloat3("vertices[1]", &triangle.vertices[1].x, 0.01f);
+		ImGui::DragFloat3("vertices[2]", &triangle.vertices[2].x, 0.01f);
+
 		
 		ImGui::End();
 		
