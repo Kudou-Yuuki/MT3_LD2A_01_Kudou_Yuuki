@@ -207,8 +207,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::End();
 		
 		Novice::ScreenPrintf(0, 0, "Move : WASD");
-		Novice::ScreenPrintf(0, 20, "RGIHT CLICK : LotateY");
-		Novice::ScreenPrintf(0, 40, "LEFT  CLICK : LotateZ");
+		Novice::ScreenPrintf(0, 20, "SPACE & RGIHT CLICK : LotateY");
+		Novice::ScreenPrintf(0, 40, "SPACE & LEFT  CLICK : LotateZ");
 
 
 
