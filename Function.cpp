@@ -410,7 +410,7 @@ Vector3 Project(const Vector3& v1, const Vector3& v2) {
 	}
 	float scale = dot / lengthSquared;
 	return {v2.x * scale, v2.y * scale, v2.z * scale};
-}
+} 
 
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 	Vector3 segmentToPoint = Subtract(point, segment.origin);

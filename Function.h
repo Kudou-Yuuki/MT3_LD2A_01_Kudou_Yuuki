@@ -57,7 +57,7 @@ void DrawGrid(const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewportMa
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
 Vector3 Project(const Vector3& vector, const Vector3& normal);
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
-
+ 
 Vector3 Add(const Vector3& v1, const Vector3& v2);
 Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
