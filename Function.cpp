@@ -30,6 +30,65 @@ Matrix4x4 MakePrespectiveMatrix(float fovY, float aspectRatio, float nearClip, f
 	return result;
 }
 
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+		Vector3 min = aabb.min;
+		Vector3 max = aabb.max;
+
+		Vector3 vertices[8] = {
+		    {min.x, min.y, min.z},
+            {max.x, min.y, min.z},
+            {max.x, max.y, min.z},
+            {min.x, max.y, min.z},
+            {min.x, min.y, max.z},
+            {max.x, min.y, max.z},
+            {max.x, max.y, max.z},
+            {min.x, max.y, max.z}
+        };
+
+		Vector3 screenVertices[8];
+		for (int i = 0; i < 8; ++i) {
+			Vector3 ndc = Transform(vertices[i], viewProjectionMatrix); // NDCへ
+			screenVertices[i] = Transform(ndc, viewPortMatrix);         // スクリーン座標へ
+		}
+
+		const int edgeIndices[12][2] = {
+		    {0, 1},
+            {1, 2},
+            {2, 3},
+            {3, 0},
+            {4, 5},
+            {5, 6},
+            {6, 7},
+            {7, 4},
+            {0, 4},
+            {1, 5},
+            {2, 6},
+            {3, 7}
+        };
+
+		for (int i = 0; i < 12; ++i) {
+			Vector3 p0 = screenVertices[edgeIndices[i][0]];
+			Vector3 p1 = screenVertices[edgeIndices[i][1]];
+			Novice::DrawLine((int)p0.x, (int)p0.y, (int)p1.x, (int)p1.y, color);
+		}
+	}
+
+	
+
+
+
+
+
+
+
+	
+
+
+
+
+bool isCollision(const AABB& aabb1, const AABB& aabb2) {
+	return (aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) && (aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) && (aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z);
+}
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result{};
 	result.m[0][0] = 2.0f / (right - left);

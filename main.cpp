@@ -41,6 +41,16 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    {{-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}
     };
 
+AABB aabb1 = {
+	    {-0.5f, -0.5f, -0.5f},
+        {0,     0,     0    }
+    };
+
+	AABB aabb2 = {
+	    {0.2f, 0.2f, 0.2f},
+        {1.0f, 1.0f, 1.0f}
+    };
+
 	Vector3 point{-1.5f, 0.6f, 0.6f};
 	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
 	Vector3 closestPoint = ClosestPoint(point, segment);
@@ -160,7 +170,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		plane.normal = Normalize(plane.normal);
 
-		if (IsCollision(triangle,segment)) {
+		if (isCollision(aabb1,aabb2)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -193,20 +203,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
-		Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, color);
-		DrawTriangle(triangle, Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
+		DrawAABB(aabb1, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
+		DrawAABB(aabb2, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
+		
 		ImGui::Begin("Hello, world!");
+
+		ImGui::DragFloat3("aabb1.max", &aabb1.max.x, 0.01f);
+		ImGui::DragFloat3("aabb1.min", &aabb1.min.x, 0.01f);
+		ImGui::DragFloat3("aabb2.max", &aabb2.max.x, 0.01f);
+		ImGui::DragFloat3("aabb2.min", &aabb2.min.x, 0.01f);
 	
 		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 	
-		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
-	
-		ImGui::DragFloat3("vertices[0]", &triangle.vertices[0].x, 0.01f);
-		ImGui::DragFloat3("vertices[1]", &triangle.vertices[1].x, 0.01f);
-		ImGui::DragFloat3("vertices[2]", &triangle.vertices[2].x, 0.01f);
-
 		
 		ImGui::End();
 		
