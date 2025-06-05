@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <imgui.h>
 #include <corecrt_math.h>
+  #include <algorithm> // Ensure this header is included for std::max
+
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
 
 static const int kColumnWidth = 60;
@@ -133,8 +135,9 @@ AABB aabb1 = {
 		Matrix4x4 projectionMatrix = MakePrespectiveMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 		Matrix4x4 WorldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
-
-		for (uint32_t i = 0; i < 3; ++i) {
+		
+	
+      for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], WorldViewProjectionMatrix);
 			ScreenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}
@@ -170,7 +173,7 @@ AABB aabb1 = {
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		plane.normal = Normalize(plane.normal);
 
-		if (isCollision(aabb1,aabb2)) {
+		if (isCollision(aabb1, sphere)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -204,14 +207,14 @@ AABB aabb1 = {
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 		DrawAABB(aabb1, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		DrawAABB(aabb2, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		
+		DrawSphere(sphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
+
 		ImGui::Begin("Hello, world!");
 
-		ImGui::DragFloat3("aabb1.max", &aabb1.max.x, 0.01f);
-		ImGui::DragFloat3("aabb1.min", &aabb1.min.x, 0.01f);
-		ImGui::DragFloat3("aabb2.max", &aabb2.max.x, 0.01f);
-		ImGui::DragFloat3("aabb2.min", &aabb2.min.x, 0.01f);
+		ImGui::DragFloat3("aabb1.max", &aabb1.Max.x, 0.01f);
+		ImGui::DragFloat3("aabb1.min", &aabb1.Min.x, 0.01f);
+		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
+		ImGui::DragFloat3("sphere.radius", &sphere.radius, 0.01f);
 	
 		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);

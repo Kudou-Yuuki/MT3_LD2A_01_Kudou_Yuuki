@@ -1,7 +1,17 @@
+#define NOMINMAX
+#include <Windows.h>  // もし使っているなら
+#ifdef max
+#undef max
+#endif
+
+#ifdef min
+#undef min
+#endif
 #include "Function.h"
 #include <Novice.h>
 #include <cmath>
 #include <cassert>
+#include <algorithm>
 #define M_PI 3.14159265358979323846
 
 static const int kColumnWidth = 60;
@@ -31,8 +41,8 @@ Matrix4x4 MakePrespectiveMatrix(float fovY, float aspectRatio, float nearClip, f
 }
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
-		Vector3 min = aabb.min;
-		Vector3 max = aabb.max;
+		Vector3 min = aabb.Min;
+		Vector3 max = aabb.Max;
 
 		Vector3 vertices[8] = {
 		    {min.x, min.y, min.z},
@@ -87,8 +97,10 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 
 
 bool isCollision(const AABB& aabb1, const AABB& aabb2) {
-	return (aabb1.min.x <= aabb2.max.x && aabb1.max.x >= aabb2.min.x) && (aabb1.min.y <= aabb2.max.y && aabb1.max.y >= aabb2.min.y) && (aabb1.min.z <= aabb2.max.z && aabb1.max.z >= aabb2.min.z);
+	return (aabb1.Min.x <= aabb2.Max.x && aabb1.Max.x >= aabb2.Min.x) && (aabb1.Min.y <= aabb2.Max.y && aabb1.Max.y >= aabb2.Min.y) && (aabb1.Min.z <= aabb2.Max.z && aabb1.Max.z >= aabb2.Min.z);
 }
+
+
 Matrix4x4 MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 	Matrix4x4 result{};
 	result.m[0][0] = 2.0f / (right - left);
@@ -536,4 +548,16 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 		int next = (i + 1) % 3;
 		Novice::DrawLine((int)screenVertices[i].x, (int)screenVertices[i].y, (int)screenVertices[next].x, (int)screenVertices[next].y, color);
 	}
+}
+
+bool isCollision(const AABB& aabb, const Sphere& sphere) {
+
+	Vector3 closestPoint = {
+
+	    std::max(aabb.Min.x, std::min(sphere.center.x, aabb.Max.x)), std::max(aabb.Min.y, std::min(sphere.center.y, aabb.Max.y)), std::max(aabb.Min.z, std::min(sphere.center.z, aabb.Max.z))};
+
+	Vector3 diff = Subtract(closestPoint, sphere.center);
+	float distanceSquared = Dot(diff, diff);
+
+	return distanceSquared <= (sphere.radius * sphere.radius);
 }

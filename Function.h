@@ -82,10 +82,12 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatri
 
 
 	struct AABB {
-	Vector3 min;
-	Vector3 max;
+	Vector3 Min;
+	Vector3 Max;
 };
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
 
 bool isCollision(const AABB& aabb1, const AABB& aabb2);
+
+bool isCollision(const AABB& aabb, const Sphere &sphere);
