@@ -71,18 +71,28 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 ScreenVertices[3];
 
-	Vector3 cameraPositions[3] = {
 	
-		{-0.8f, 0.58f, 1.0f},
-	    {1.76f, 1.0f, -0.3f},
-	    {0.94f, -0.7f, 2.3f},
-	};
 
 	Vector3 controlPoint[3] = {
 
 	    {-0.8f, 0.58f, 1.0f },
 	    {1.76f, 1.0f,  -0.3f},
 	    {0.94f, -0.7f, 2.3f },
+	};
+
+	Sphere SpherecontrolPoint[3] =
+	{
+	    {
+         {controlPoint[0].x, controlPoint[0].y, controlPoint[0].z},
+		0.01f,
+	     },
+	    {
+         {controlPoint[1].x, controlPoint[1].y, controlPoint[1].z},
+         0.01f, },
+	    {
+         {controlPoint[2].x, controlPoint[2].y, controlPoint[2].z},
+         0.01f, },
+    
 	};
 	int color = RED;
 
@@ -185,9 +195,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else {
 			color = WHITE;
 		}
+		for (int i = 0; i < 3; ++i) {
+			SpherecontrolPoint[i] = {
 
-		
-	
+			    {controlPoint[i].x, controlPoint[i].y, controlPoint[i].z},
+			    0.01f,
+			};
+		}
 	
 		prevMouseX = mouseX;
 		prevMouseY = mouseY;
@@ -214,17 +228,21 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 		DrawBezier(  
-		        {-1.0f, 0.0f, 0.0f},
-                {1.0f,  0.0f, 0.0f},
-                {0.0f,  1.0f, 0.0f},
+		     controlPoint[0], controlPoint[1], controlPoint[2],
 		    Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
-		
+		DrawSphere(SpherecontrolPoint[0], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
+		DrawSphere(SpherecontrolPoint[1], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
+		DrawSphere(SpherecontrolPoint[2], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
+
+
 		ImGui::Begin("Hello, world!");
 
-		ImGui::DragFloat3("aabb1.max", &aabb1.Max.x, 0.01f);
-		ImGui::DragFloat3("aabb1.min", &aabb1.Min.x, 0.01f);
-		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
-		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("controlPoint.1", &controlPoint[0].x, 0.01f);
+
+		ImGui::DragFloat3("controlPoint.2", &controlPoint[1].x, 0.01f);
+
+		ImGui::DragFloat3("controlPoint.3", &controlPoint[2].x, 0.01f);
+		
 		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 	
