@@ -35,6 +35,20 @@ struct AABB {
 struct Triangle {
 	Vector3 vertices[3];
 };
+
+struct Vector3 {
+	float x, y, z;
+
+	// Vector3 + Vector3
+	Vector3 operator+(const Vector3& rhs) const { return {x + rhs.x, y + rhs.y, z + rhs.z}; }
+
+	// Vector3 * float
+	Vector3 operator*(float scalar) const { return {x * scalar, y * scalar, z * scalar}; }
+
+	// float * Vector3
+	friend Vector3 operator*(float scalar, const Vector3& vec) { return {vec.x * scalar, vec.y * scalar, vec.z * scalar}; }
+};
+
 Vector3 Multiply(const Vector3 vector1, const Vector3& vector2);
 
 	void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);
@@ -94,3 +108,12 @@ bool isCollision(const AABB& aabb, const Sphere &sphere);
 
 
 bool isCollision(const AABB& aabb, const Segment& segment);
+
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t);
+
+void DrawBezier(
+	const Vector3& contorolPoint0, 
+	const Vector3& contorolPoint1, 
+	const Vector3& contorolPoint2,
+	const Matrix4x4& viewProjectionMatrix, 
+	const Matrix4x4& viewPortMatrix, uint32_t color);

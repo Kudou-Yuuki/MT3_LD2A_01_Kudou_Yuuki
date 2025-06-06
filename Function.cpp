@@ -597,3 +597,35 @@ bool isCollision(const AABB& aabb, const Segment& segment) {
 
 	return true;
 }
+
+Vector3 Lerp(const Vector3& v1, const Vector3& v2, float t) {
+	return {v1.x + (v2.x - v1.x) * t, v1.y + (v2.y - v1.y) * t, v1.z + (v2.z - v1.z) * t};
+
+
+}
+
+void DrawBezier(const Vector3& controlPoint0, const Vector3& controlPoint1, const Vector3& controlPoint2, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color) {
+
+	const int kSubdivision = 32; // 分割数（滑らかさ）
+
+	auto Bezier = [](float t, const Vector3& p0, const Vector3& p1, const Vector3& p2) -> Vector3 {
+		float u = 1.0f - t;
+		return u * u * p0 + 2 * u * t * p1 + t * t * p2;
+	};
+
+
+	Vector3 previous = Bezier(0.0f, controlPoint0, controlPoint1, controlPoint2);
+	for (int i = 1; i <= kSubdivision; ++i) {
+		float t = static_cast<float>(i) / kSubdivision;
+		Vector3 current = Bezier(t, controlPoint0, controlPoint1, controlPoint2);
+
+		// 座標変換
+		Vector3 prevScreen = Transform(Transform(previous, viewProjectionMatrix), viewPortMatrix);
+		Vector3 currScreen = Transform(Transform(current, viewProjectionMatrix), viewPortMatrix);
+
+		// 描画（仮の関数：Line）
+		Novice::DrawLine(static_cast<int>(prevScreen.x), static_cast<int>(prevScreen.y), static_cast<int>(currScreen.x), static_cast<int>(currScreen.y), color);
+
+		previous = current;
+	}
+}

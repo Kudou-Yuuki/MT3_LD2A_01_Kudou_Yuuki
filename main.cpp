@@ -71,8 +71,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 ScreenVertices[3];
 
+	Vector3 cameraPositions[3] = {
+	
+		{-0.8f, 0.58f, 1.0f},
+	    {1.76f, 1.0f, -0.3f},
+	    {0.94f, -0.7f, 2.3f},
+	};
 
+	Vector3 controlPoint[3] = {
 
+	    {-0.8f, 0.58f, 1.0f },
+	    {1.76f, 1.0f,  -0.3f},
+	    {0.94f, -0.7f, 2.3f },
+	};
 	int color = RED;
 
 	static const Vector3 kLocalVertices[3] = {
@@ -202,8 +213,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
-		DrawAABB(aabb1, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, color);
+		DrawBezier(  
+		        {-1.0f, 0.0f, 0.0f},
+                {1.0f,  0.0f, 0.0f},
+                {0.0f,  1.0f, 0.0f},
+		    Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
+		
 		ImGui::Begin("Hello, world!");
 
 		ImGui::DragFloat3("aabb1.max", &aabb1.Max.x, 0.01f);
