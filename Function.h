@@ -91,3 +91,6 @@ void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Mat
 bool isCollision(const AABB& aabb1, const AABB& aabb2);
 
 bool isCollision(const AABB& aabb, const Sphere &sphere);
+
+
+bool isCollision(const AABB& aabb, const Segment& segment);

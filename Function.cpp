@@ -561,3 +561,12 @@ bool isCollision(const AABB& aabb, const Sphere& sphere) {
 
 	return distanceSquared <= (sphere.radius * sphere.radius);
 }
+
+bool isCollision(const AABB& aabb, const Segment& segment) { 
+
+	Vector3 closestPoint = ClosestPoint(segment.origin, segment);
+	return (closestPoint.x >= aabb.Min.x && closestPoint.x <= aabb.Max.x) && (closestPoint.y >= aabb.Min.y && closestPoint.y <= aabb.Max.y) &&
+	       (closestPoint.z >= aabb.Min.z && closestPoint.z <= aabb.Max.z);
+
+
+}

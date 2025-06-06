@@ -35,23 +35,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
     };
 	Segment segment = {
-	    {-2.0f, -1.0f, 0.0f},
-        {3.0f,2.0f,2.0f,}
+	    {-0.7f, 0.3f,  0.0f},
+        {2.0f,  -0.5f, 0.0f}
     };
 
 	Triangle triangle = {
 	    {{-1.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}}
     };
 
-AABB aabb1 = {
+	AABB aabb1 = {
 	    {-0.5f, -0.5f, -0.5f},
-        {0,     0,     0    }
+        {0.5f,  0.5f,  0.5f }
     };
 
-	AABB aabb2 = {
-	    {0.2f, 0.2f, 0.2f},
-        {1.0f, 1.0f, 1.0f}
-    };
 
 	Vector3 point{-1.5f, 0.6f, 0.6f};
 	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
@@ -173,7 +169,7 @@ AABB aabb1 = {
 		Vector3 end = Transform(Transform(Add(segment.origin, segment.diff), Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 		plane.normal = Normalize(plane.normal);
 
-		if (isCollision(aabb1, sphere)) {
+		if (isCollision(aabb1, segment)) {
 			color = RED;
 		} else {
 			color = WHITE;
@@ -207,8 +203,7 @@ AABB aabb1 = {
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 		DrawAABB(aabb1, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		DrawSphere(sphere, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-
+		Draw
 		ImGui::Begin("Hello, world!");
 
 		ImGui::DragFloat3("aabb1.max", &aabb1.Max.x, 0.01f);
