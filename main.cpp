@@ -203,14 +203,13 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
 		DrawAABB(aabb1, Multiply(viewMatrix, projectionMatrix), viewportMatrix, color);
-		Draw
+		Novice::DrawLine((int)start.x, (int)start.y, (int)end.x, (int)end.y, color);
 		ImGui::Begin("Hello, world!");
 
 		ImGui::DragFloat3("aabb1.max", &aabb1.Max.x, 0.01f);
 		ImGui::DragFloat3("aabb1.min", &aabb1.Min.x, 0.01f);
-		ImGui::DragFloat3("sphere.center", &sphere.center.x, 0.01f);
-		ImGui::DragFloat3("sphere.radius", &sphere.radius, 0.01f);
-	
+		ImGui::DragFloat3("segment.diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("segment.origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
 	

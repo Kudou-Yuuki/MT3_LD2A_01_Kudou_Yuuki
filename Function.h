@@ -27,6 +27,11 @@ struct Segment {
 	Vector3 diff;
 };
 
+struct AABB {
+	Vector3 Min;
+	Vector3 Max;
+};
+
 struct Triangle {
 	Vector3 vertices[3];
 };
@@ -80,11 +85,6 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjectionMatrix, const 
 
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
 
-
-	struct AABB {
-	Vector3 Min;
-	Vector3 Max;
-};
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjectionMatrix, const Matrix4x4& viewPortMatrix, uint32_t color);
 

@@ -561,12 +561,39 @@ bool isCollision(const AABB& aabb, const Sphere& sphere) {
 
 	return distanceSquared <= (sphere.radius * sphere.radius);
 }
+bool isCollision(const AABB& aabb, const Segment& segment) {
+	Vector3 start = segment.origin;
+	Vector3 dir = segment.diff; // 方向ベクトル（終点 = origin + diff）
 
-bool isCollision(const AABB& aabb, const Segment& segment) { 
+	float tMin = 0.0f;
+	float tMax = 1.0f;
 
-	Vector3 closestPoint = ClosestPoint(segment.origin, segment);
-	return (closestPoint.x >= aabb.Min.x && closestPoint.x <= aabb.Max.x) && (closestPoint.y >= aabb.Min.y && closestPoint.y <= aabb.Max.y) &&
-	       (closestPoint.z >= aabb.Min.z && closestPoint.z <= aabb.Max.z);
+	for (int i = 0; i < 3; ++i) {
+		float s = (&start.x)[i];
+		float d = (&dir.x)[i];
+		float min = (&aabb.Min.x)[i];
+		float max = (&aabb.Max.x)[i];
 
+		if (fabsf(d) < 1e-6f) {
+			// 平行 → 範囲外なら衝突なし
+			if (s < min || s > max) {
+				return false;
+			}
+		} else {
+			float t1 = (min - s) / d;
+			float t2 = (max - s) / d;
+			if (t1 > t2)
+				std::swap(t1, t2);
 
+			tMin = std::max(tMin, t1);
+			tMax = std::min(tMax, t2);
+
+			// 線分の範囲外（0〜1）なら衝突しない
+			if (tMin > tMax || tMax < 0.0f || tMin > 1.0f) {
+				return false;
+			}
+		}
+	}
+
+	return true;
 }
