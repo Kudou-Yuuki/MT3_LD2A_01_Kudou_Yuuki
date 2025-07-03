@@ -1,11 +1,10 @@
-
 #include "../DirectXGame/math/Vector3.h"
 #include "Function.h"
 #include <Novice.h>
+#include <algorithm> // Ensure this header is included for std::max
+#include <corecrt_math.h>
 #include <cstdint>
 #include <imgui.h>
-#include <corecrt_math.h>
-  #include <algorithm> // Ensure this header is included for std::max
 
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
 
@@ -31,8 +30,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Plane plane = {
 	    {0.2f, 0.2f, 0.2f},
         1.0f
-
-
     };
 	Segment segment = {
 	    {-0.7f, 0.3f,  0.0f},
@@ -48,12 +45,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {0.5f,  0.5f,  0.5f }
     };
 
-
 	Vector3 point{-1.5f, 0.6f, 0.6f};
 	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
 	Vector3 closestPoint = ClosestPoint(point, segment);
-
-
 
 	Sphere pointSphere = {point, 1.0f};
 
@@ -71,29 +65,45 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	Vector3 ScreenVertices[3];
 
-	
-
 	Vector3 controlPoint[3] = {
-
-	    {-0.8f, 0.58f, 1.0f },
-	    {1.76f, 1.0f,  -0.3f},
-	    {0.94f, -0.7f, 2.3f },
+	    {0.2f, 0.5f, 0.0f}, // 肩
+	    {0.4f, 0.0f, 0.0f}, // ひじ
+	    {0.3f, -0.5f, 0.0f}, // 手
 	};
 
-	Sphere SpherecontrolPoint[3] =
-	{
+	Sphere SpherecontrolPoint[3] = {
 	    {
          {controlPoint[0].x, controlPoint[0].y, controlPoint[0].z},
-		0.01f,
-	     },
+         0.01f, },
 	    {
          {controlPoint[1].x, controlPoint[1].y, controlPoint[1].z},
          0.01f, },
 	    {
          {controlPoint[2].x, controlPoint[2].y, controlPoint[2].z},
          0.01f, },
-    
 	};
+
+	// 各関節のローカル平行移動（親基準）
+	Vector3 translates[3] = {
+	    {0.2f, 0.5f, 0.0f}, // 肩
+	    {0.4f, 0.0f, 0.0f}, // ひじ
+	    {0.3f, 0.0f, 0.0f}, // 手
+	};
+
+	// 各関節のローカル回転（ラジアン）
+	Vector3 rotates[3] = {
+	    {0.0f, 0.0f, -6.8f},
+	    {0.0f, 0.0f, -1.4f},
+	    {0.0f, 0.0f, 0.0f },
+	};
+
+	// 各関節のスケール（基本1）
+	Vector3 scales[3] = {
+	    {1.0f, 1.0f, 1.0f},
+	    {1.0f, 1.0f, 1.0f},
+	    {1.0f, 1.0f, 1.0f},
+	};
+
 	int color = RED;
 
 	static const Vector3 kLocalVertices[3] = {
@@ -111,10 +121,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	int mouseY = 0;
 	int mouseMoveX = 0;
 	int mouseMoveY = 0;
-	
+
 	// マウスの移動量に基づいてカメラの回転角度を変更
 	const float sensitivity = 0.01f; // 感度を調整
-		
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -143,8 +153,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		}
 		VectorScreenPrintf(0, 0, cross, "cross");
 		cameraRotate.y += mouseMoveX * sensitivity; // Y軸回転を更新
-		cameraRotate.x += mouseMoveY * sensitivity; // Y軸回転を更新
-
+		cameraRotate.x += mouseMoveY * sensitivity; // X軸回転を更新
 
 		Matrix4x4 worldMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, rotate, translate);
 		Matrix4x4 cameraMatrix = MakeAffineMatrix({1.0f, 1.0f, 1.0f}, cameraRotate, cameraPosition);
@@ -152,9 +161,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 projectionMatrix = MakePrespectiveMatrix(0.45f, float(kWindowWidth) / float(kWindowHeight), 0.1f, 100.0f);
 		Matrix4x4 WorldViewProjectionMatrix = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 		Matrix4x4 viewportMatrix = MakeViewportMatrix(0.0f, 0.0f, kWindowWidth, kWindowHeight, 0.0f, 1.0f);
-		
-	
-      for (uint32_t i = 0; i < 3; ++i) {
+
+		for (uint32_t i = 0; i < 3; ++i) {
 			Vector3 ndcVertex = Transform(kLocalVertices[i], WorldViewProjectionMatrix);
 			ScreenVertices[i] = Transform(ndcVertex, viewportMatrix);
 		}
@@ -195,66 +203,72 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		} else {
 			color = WHITE;
 		}
+
 		for (int i = 0; i < 3; ++i) {
 			SpherecontrolPoint[i] = {
-
 			    {controlPoint[i].x, controlPoint[i].y, controlPoint[i].z},
-			    0.01f,
+			    0.11f,
 			};
 		}
-	
+
+		// 階層的なローカルマトリクスを作成してワールド行列を計算
+		Matrix4x4 shoulderLocal = MakeAffineMatrix(scales[0], rotates[0], translates[0]);
+		Matrix4x4 elbowLocal = MakeAffineMatrix(scales[1], rotates[1], translates[1]);
+		Matrix4x4 handLocal = MakeAffineMatrix(scales[2], rotates[2], translates[2]);
+
+		Matrix4x4 shoulderWorld = shoulderLocal;                    // 肩はワールド基準
+		Matrix4x4 elbowWorld = Multiply(elbowLocal, shoulderWorld); // ひじは肩の子
+		Matrix4x4 handWorld = Multiply(handLocal, elbowWorld);      // 手はひじの子
+
+		// ワールド行列で球の位置を更新
+		SpherecontrolPoint[0].center = Transform(controlPoint[0], shoulderWorld);
+		SpherecontrolPoint[1].center = Transform(controlPoint[1], elbowWorld);
+		SpherecontrolPoint[2].center = Transform(controlPoint[2], handWorld);
+
 		prevMouseX = mouseX;
 		prevMouseY = mouseY;
 
-		//if (cameraRotate.x > 1) {
-		//	cameraRotate.x = 1;
-		//} else if (cameraRotate.x <= -1) {
-		//	cameraRotate.x = -1;
-		//}
-		//if (cameraRotate.y > 1) {
-		//	cameraRotate.y = 1;
-		//} else if (cameraRotate.y <= -1) {
-		//	cameraRotate.y = -1;
-		//}
-		
 		///
 		/// ↑更新処理ここまで
 		///
 
-		///Multiply
-		/// ↓描画処理ここから
 		///
+		/// ↓描画処理ここから
 		///
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
-		DrawBezier(  
-		     controlPoint[0], controlPoint[1], controlPoint[2],
-		    Multiply(viewMatrix, projectionMatrix), viewportMatrix, WHITE);
-		DrawSphere(SpherecontrolPoint[0], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
-		DrawSphere(SpherecontrolPoint[1], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
-		DrawSphere(SpherecontrolPoint[2], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
 
+		DrawSphere(SpherecontrolPoint[0], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
+		DrawSphere(SpherecontrolPoint[1], Multiply(viewMatrix, projectionMatrix), viewportMatrix, GREEN);
+		DrawSphere(SpherecontrolPoint[2], Multiply(viewMatrix, projectionMatrix), viewportMatrix, BLUE);
+
+		Vector3 screenPos0 = Transform(Transform(SpherecontrolPoint[0].center, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
+		Vector3 screenPos1 = Transform(Transform(SpherecontrolPoint[1].center, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
+		Vector3 screenPos2 = Transform(Transform(SpherecontrolPoint[2].center, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
+
+		Novice::DrawLine(int(screenPos0.x), int(screenPos0.y), int(screenPos1.x), int(screenPos1.y), WHITE);
+		Novice::DrawLine(int(screenPos1.x), int(screenPos1.y), int(screenPos2.x), int(screenPos2.y), WHITE);
 
 		ImGui::Begin("Hello, world!");
 
-		ImGui::DragFloat3("controlPoint.1", &controlPoint[0].x, 0.01f);
+		ImGui::DragFloat3("Sholder.point", &translates[0].x, 0.01f);
+		ImGui::DragFloat3("elbow.point", &translates[1].x, 0.01f);
+		ImGui::DragFloat3(" hand.point", &translates[2].x, 0.01f);
 
-		ImGui::DragFloat3("controlPoint.2", &controlPoint[1].x, 0.01f);
+		ImGui::DragFloat3("Sholder.rotates", &rotates[0].x, 0.01f);
+		ImGui::DragFloat3("elbow.rotates", &rotates[1].x, 0.01f);
+		ImGui::DragFloat3(" hand.rotates", &rotates[2].x, 0.01f);
 
-		ImGui::DragFloat3("controlPoint.3", &controlPoint[2].x, 0.01f);
-		
+
+
 		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
 		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
-	
-		
+
 		ImGui::End();
-		
+
 		Novice::ScreenPrintf(0, 0, "Move : WASD");
 		Novice::ScreenPrintf(0, 20, "SPACE & RGIHT CLICK : LotateY");
 		Novice::ScreenPrintf(0, 40, "SPACE & LEFT  CLICK : LotateZ");
-
-
-
 
 		///
 		/// ↑描画処理ここまで
