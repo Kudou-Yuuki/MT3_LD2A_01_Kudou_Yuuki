@@ -8,13 +8,13 @@
 
 const char kWindowTitle[] = "LD2A_01_クドウユウキ_タイトル";
 
-static const int kColumnWidth = 60;
-static const int kRowHeight = 30;
-
-static const int kWindowWidth = 1280;
-static const int kWindowHeight = 720;
 // Windowsアプリでのエントリーポイント(main関数)
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
+	static const int kColumnWidth = 60;
+	static const int kRowHeight = 30;
+
+	static const int kWindowWidth = 1280;
+	static const int kWindowHeight = 720;
 
 	// ライブラリの初期化
 	Novice::Initialize(kWindowTitle, 1280, 720);
@@ -59,8 +59,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 v1 = {1.2f, -3.9f, 2.5f};
 	Vector3 v2 = {2.8f, 0.4f, -1.3f};
 	Vector3 cross = Cross(v1, v2);
-
-	Vector3 rotate{0.0f, 0.0f, 0.0f};
 	Vector3 translate = {0.0f, 0.0f, 3.0f};
 
 	Vector3 ScreenVertices[3];
@@ -103,6 +101,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	    {1.0f, 1.0f, 1.0f},
 	    {1.0f, 1.0f, 1.0f},
 	};
+
+
+	Vector3 a{0.2f, 1.0f, 0.0f};
+	Vector3 b{2.4f, 3.1f, 1.2f};
+	Vector3 c = a + b;
+	Vector3 d = a - b;
+	Vector3 e = a * 2.4f;
+
+	Vector3 rotate{0.4f, 1.43f, -0.8f};
 
 	int color = RED;
 
@@ -228,6 +235,12 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		prevMouseX = mouseX;
 		prevMouseY = mouseY;
 
+		Matrix4x4 rotateXMatrix = MakeRotateXMatrix(rotate.x);
+		Matrix4x4 rotateYMatrix = MakeRotateYMatrix(rotate.y);
+		Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
+		Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
+
+
 		///
 		/// ↑更新処理ここまで
 		///
@@ -249,22 +262,18 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::DrawLine(int(screenPos0.x), int(screenPos0.y), int(screenPos1.x), int(screenPos1.y), WHITE);
 		Novice::DrawLine(int(screenPos1.x), int(screenPos1.y), int(screenPos2.x), int(screenPos2.y), WHITE);
 
-		ImGui::Begin("Hello, world!");
-
-		ImGui::DragFloat3("Sholder.point", &translates[0].x, 0.01f);
-		ImGui::DragFloat3("elbow.point", &translates[1].x, 0.01f);
-		ImGui::DragFloat3(" hand.point", &translates[2].x, 0.01f);
-
-		ImGui::DragFloat3("Sholder.rotates", &rotates[0].x, 0.01f);
-		ImGui::DragFloat3("elbow.rotates", &rotates[1].x, 0.01f);
-		ImGui::DragFloat3(" hand.rotates", &rotates[2].x, 0.01f);
-
-
-
-		ImGui::DragFloat3("cameraPosition", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
-
-		ImGui::End();
+		ImGui ::Begin("Window");
+	ImGui:: Text("c:%f, %f, %f", c.x, c.y, c.z) ;
+	ImGui:: Text("d:%f, %f, %f", d.x, d.y, d. z) ;
+	ImGui:: Text("e:%f, %f, %f", e.x, e.y, e.z);
+	ImGui:: Text("matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f",
+		rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0] [2],
+		rotateMatrix.m[0][3], rotateMatrix.m[1][0], rotateMatrix.m[1] [1],
+		rotateMatrix.m[1][2], rotateMatrix.m[1][3], rotateMatrix.m[2] [0],
+		rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2] [3],
+		rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3] [2],
+		rotateMatrix.m[3][3] );
+	ImGui:: End( );
 
 		Novice::ScreenPrintf(0, 0, "Move : WASD");
 		Novice::ScreenPrintf(0, 20, "SPACE & RGIHT CLICK : LotateY");

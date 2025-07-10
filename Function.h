@@ -4,6 +4,8 @@
 #include "../DirectXGame/math/Vector3.h"
 #include <cstdint>
 
+
+
 struct Sphere {
 	Vector3 center;
 	float radius;
@@ -104,3 +106,14 @@ void DrawBezier(
 	const Vector3& contorolPoint2,
 	const Matrix4x4& viewProjectionMatrix, 
 	const Matrix4x4& viewPortMatrix, uint32_t color);
+
+
+inline Vector3 operator+(const Vector3& a, const Vector3& b) { return Add(a, b); }; 
+
+inline Vector3 operator-(const Vector3& a, const Vector3& b) { return Subtract(a, b); };
+
+inline Vector3 operator*(const Vector3& vector, float scalar) { return Multiply(vector, scalar); };
+
+inline Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2) { return Multiply(m1, m2); };
+
+
