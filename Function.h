@@ -4,7 +4,7 @@
 #include "../DirectXGame/math/Vector3.h"
 #include <cstdint>
 
-
+#include <cmath>
 
 struct Sphere {
 	Vector3 center;
@@ -36,6 +36,22 @@ struct AABB {
 
 struct Triangle {
 	Vector3 vertices[3];
+};
+
+struct Spring {
+	Vector3 position;
+	float naturalLength;
+	float stiffness;
+	float dampingCoefficient;
+};
+
+struct Ball {
+	Vector3 position;
+	Vector3 velocity;
+	Vector3 acceleration;
+	float mass;
+	float radius;
+	int color;
 };
 
 Vector3 Multiply(const Vector3 vector1, const Vector3& vector2);
@@ -116,4 +132,14 @@ inline Vector3 operator*(const Vector3& vector, float scalar) { return Multiply(
 
 inline Matrix4x4 operator*(const Matrix4x4& m1, const Matrix4x4& m2) { return Multiply(m1, m2); };
 
+inline float Length(const Vector3& v) { return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z); }
 
+inline Vector3 operator/(const Vector3& v, float scalar) { return {v.x / scalar, v.y / scalar, v.z / scalar}; }
+
+inline Vector3& operator+=(Vector3& lhs, const Vector3& rhs) {
+	lhs.x += rhs.x;
+	lhs.y += rhs.y;
+	lhs.z += rhs.z;
+	return lhs;
+}
+inline Vector3 operator*(float scalar, const Vector3& vector) { return {vector.x * scalar, vector.y * scalar, vector.z * scalar}; }

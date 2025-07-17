@@ -45,6 +45,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         {0.5f,  0.5f,  0.5f }
     };
 
+	Spring spring = {
+		{0.0f, 0.0f, 0.0f}, 
+		{1.0f}, 
+		{100},
+        {2.0f},
+	};
+
+	Ball ball = {
+	    {1.2f, 0.0f, 0.0f}, // position
+	    {0.0f, 0.0f, 0.0f}, // velocity ← 初期は 0 でもOK
+	    {0.0f, 0.0f, 0.0f}, // acceleration
+	    2.0f, // mass
+	    0.2f, // radius ← この値が小さすぎても描画で見えません
+	    BLUE, // color
+	};
+	bool springActive = false; // Startボタンを押したらtrueになる
+
 	Vector3 point{-1.5f, 0.6f, 0.6f};
 	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
 	Vector3 closestPoint = ClosestPoint(point, segment);
@@ -110,6 +127,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Vector3 e = a * 2.4f;
 
 	Vector3 rotate{0.4f, 1.43f, -0.8f};
+	float deltaTime = 1.0f / 60.0f;
+	
+	
 
 	int color = RED;
 
@@ -240,7 +260,30 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Matrix4x4 rotateZMatrix = MakeRotateZMatrix(rotate.z);
 		Matrix4x4 rotateMatrix = rotateXMatrix * rotateYMatrix * rotateZMatrix;
 
+		if (springActive) {
+			Vector3 diff = ball.position - spring.position;
+			float length = Length(diff);
+			if (length != 0.0f) {
+				Vector3 direction = Normalize(diff);
+				Vector3 restPosition = spring.position + direction * spring.naturalLength;
+				Vector3 displacement = ball.position - restPosition;
+				Vector3 restoringForce = -spring.stiffness * displacement;
+				Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
+				Vector3 totalForce = restoringForce + dampingForce;
 
+				ball.acceleration = totalForce / ball.mass;
+			}
+			ball.velocity += ball.acceleration * deltaTime;
+			ball.position += ball.velocity * deltaTime;
+		}
+
+		Vector3 dampingForce = -spring.dampingCoefficient * ball.velocity;
+	
+
+		float angularVelocity = 0.0f;
+		float angle = 0.0f;
+
+		angle += angularVelocity * deltaTime;
 		///
 		/// ↑更新処理ここまで
 		///
@@ -250,30 +293,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		///
 
 		DrawGrid(Multiply(viewMatrix, projectionMatrix), viewportMatrix, cameraPosition);
+		DrawSphere({ball.position, ball.radius}, Multiply(viewMatrix, projectionMatrix), viewportMatrix, ball.color);
+		// 原点をワールド→スクリーン変換
+		Vector3 screenOrigin = Transform(Transform({0.0f, 0.0f, 0.0f}, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 
-		DrawSphere(SpherecontrolPoint[0], Multiply(viewMatrix, projectionMatrix), viewportMatrix, RED);
-		DrawSphere(SpherecontrolPoint[1], Multiply(viewMatrix, projectionMatrix), viewportMatrix, GREEN);
-		DrawSphere(SpherecontrolPoint[2], Multiply(viewMatrix, projectionMatrix), viewportMatrix, BLUE);
+		// 球の中心もワールド→スクリーン変換
+		Vector3 screenBall = Transform(Transform(ball.position, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
 
-		Vector3 screenPos0 = Transform(Transform(SpherecontrolPoint[0].center, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
-		Vector3 screenPos1 = Transform(Transform(SpherecontrolPoint[1].center, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
-		Vector3 screenPos2 = Transform(Transform(SpherecontrolPoint[2].center, Multiply(viewMatrix, projectionMatrix)), viewportMatrix);
+		// 線を描画（原点 → ボール位置）
+		Novice::DrawLine(int(screenOrigin.x), int(screenOrigin.y), int(screenBall.x), int(screenBall.y), BLACK);
+		ImGui::Begin("Window");
 
-		Novice::DrawLine(int(screenPos0.x), int(screenPos0.y), int(screenPos1.x), int(screenPos1.y), WHITE);
-		Novice::DrawLine(int(screenPos1.x), int(screenPos1.y), int(screenPos2.x), int(screenPos2.y), WHITE);
+		if (ImGui::Button("Start")) {
+			springActive = true;
+		}
+		ImGui::End();
 
-		ImGui ::Begin("Window");
-	ImGui:: Text("c:%f, %f, %f", c.x, c.y, c.z) ;
-	ImGui:: Text("d:%f, %f, %f", d.x, d.y, d. z) ;
-	ImGui:: Text("e:%f, %f, %f", e.x, e.y, e.z);
-	ImGui:: Text("matrix:\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f\n%f, %f, %f, %f",
-		rotateMatrix.m[0][0], rotateMatrix.m[0][1], rotateMatrix.m[0] [2],
-		rotateMatrix.m[0][3], rotateMatrix.m[1][0], rotateMatrix.m[1] [1],
-		rotateMatrix.m[1][2], rotateMatrix.m[1][3], rotateMatrix.m[2] [0],
-		rotateMatrix.m[2][1], rotateMatrix.m[2][2], rotateMatrix.m[2] [3],
-		rotateMatrix.m[3][0], rotateMatrix.m[3][1], rotateMatrix.m[3] [2],
-		rotateMatrix.m[3][3] );
-	ImGui:: End( );
 
 		Novice::ScreenPrintf(0, 0, "Move : WASD");
 		Novice::ScreenPrintf(0, 20, "SPACE & RGIHT CLICK : LotateY");
