@@ -24,11 +24,26 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         2.0f, 0.2f, BLUE,
 	};
 
+	struct Pendulum {
+		Vector3 anchor;
+		float length;
+		float angle;
+		float angularVelocity;
+		float angularAcceleration;
+	};
+
+	Pendulum pendulum = {
+	    {0.0f, 1.0f, 0.0f}, // アンカー位置
+	    0.8f, // 長さ
+	    0.7f, // 初期角度
+	    0.0f, // 初期角速度
+	    0.0f  // 初期角加速度
+	};
+
 	Vector3 cameraPosition = {0.0f, 1.9f, -10.0f};
 	Vector3 cameraRotate = {0.26f, 0.0f, 0.0f};
 
 	float deltaTime = 1.0f / 60.0f;
-	float angle = 0.0f; // 円運動用角度
 	bool isActive = false;
 
 	int mouseX = 0, mouseY = 0, prevMouseX = 0, prevMouseY = 0;
@@ -75,24 +90,27 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		cameraPosition.x += camMove.x * 0.05f;
 		cameraPosition.z += camMove.z * 0.05f;
 
-		// 円運動
+		// 振り子運動
 		if (isActive) {
-			const float radius = 3.0f;
-			const float angularSpeed = 1.0f; // rad/s
-			angle += angularSpeed * deltaTime;
-			ball.position.x = radius * cosf(angle);
-			ball.position.y = radius * sinf(angle);
-			ball.position.z = 0.0f;
+			pendulum.angularAcceleration = -(9.8f / pendulum.length) * sinf(pendulum.angle);
+			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
+			pendulum.angularVelocity *= 0.999f; // 減衰（任意）
+			pendulum.angle += pendulum.angularVelocity * deltaTime;
+
+			ball.position.x = pendulum.anchor.x + pendulum.length * sinf(pendulum.angle);
+			ball.position.y = pendulum.anchor.y - pendulum.length * cosf(pendulum.angle);
+			ball.position.z = pendulum.anchor.z;
 		}
 
 		// 描画
 		DrawGrid(vpMatrix, viewportMatrix, cameraPosition);
 		DrawSphere({ball.position, ball.radius}, vpMatrix, viewportMatrix, ball.color);
+		DrawSphere({pendulum.anchor, 0.05f}, vpMatrix, viewportMatrix, RED);
 
-		// 中心線
-		Vector3 screenOrigin = Transform(Transform({0, 0, 0}, vpMatrix), viewportMatrix);
+	
+		Vector3 screenAnchor = Transform(Transform(pendulum.anchor, vpMatrix), viewportMatrix);
 		Vector3 screenBall = Transform(Transform(ball.position, vpMatrix), viewportMatrix);
-		Novice::DrawLine(int(screenOrigin.x), int(screenOrigin.y), int(screenBall.x), int(screenBall.y), BLACK);
+		Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenBall.x), int(screenBall.y), BLACK);
 
 		ImGui::Begin("Window");
 		if (ImGui::Button("Start")) {
@@ -107,7 +125,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		Novice::EndFrame();
 		prevMouseX = mouseX;
 		prevMouseY = mouseY;
-
 
 		if (preKeys[DIK_ESCAPE] == 0 && keys[DIK_ESCAPE] != 0)
 			break;
