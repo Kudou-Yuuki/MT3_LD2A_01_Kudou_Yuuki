@@ -24,15 +24,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         2.0f, 0.2f, BLUE,
 	};
 
-	struct Pendulum {
+	struct ConicalPendulum {
 		Vector3 anchor;
 		float length;
+		float halfApexAngle;
 		float angle;
 		float angularVelocity;
-		float angularAcceleration;
 	};
 
-	Pendulum pendulum = {
+	ConicalPendulum conicalPendulum = {
 	    {0.0f, 1.0f, 0.0f}, // アンカー位置
 	    0.8f, // 長さ
 	    0.7f, // 初期角度
@@ -90,25 +90,25 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		cameraPosition.x += camMove.x * 0.05f;
 		cameraPosition.z += camMove.z * 0.05f;
 
-		// 振り子運動
+		// 円錐振り子計算
 		if (isActive) {
-			pendulum.angularAcceleration = -(9.8f / pendulum.length) * sinf(pendulum.angle);
-			pendulum.angularVelocity += pendulum.angularAcceleration * deltaTime;
-			pendulum.angularVelocity *= 0.999f; // 減衰（任意）
-			pendulum.angle += pendulum.angularVelocity * deltaTime;
-
-			ball.position.x = pendulum.anchor.x + pendulum.length * sinf(pendulum.angle);
-			ball.position.y = pendulum.anchor.y - pendulum.length * cosf(pendulum.angle);
-			ball.position.z = pendulum.anchor.z;
+			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length) * std::cos(conicalPendulum.halfApexAngle));
+			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
 		}
+
+		float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+		float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
+
+		ball.position.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
+		ball.position.y = conicalPendulum.anchor.y - height;
+		ball.position.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
 
 		// 描画
 		DrawGrid(vpMatrix, viewportMatrix, cameraPosition);
 		DrawSphere({ball.position, ball.radius}, vpMatrix, viewportMatrix, ball.color);
-		DrawSphere({pendulum.anchor, 0.05f}, vpMatrix, viewportMatrix, RED);
+		DrawSphere({conicalPendulum.anchor, 0.05f}, vpMatrix, viewportMatrix, RED);
 
-	
-		Vector3 screenAnchor = Transform(Transform(pendulum.anchor, vpMatrix), viewportMatrix);
+		Vector3 screenAnchor = Transform(Transform(conicalPendulum.anchor, vpMatrix), viewportMatrix);
 		Vector3 screenBall = Transform(Transform(ball.position, vpMatrix), viewportMatrix);
 		Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenBall.x), int(screenBall.y), BLACK);
 
