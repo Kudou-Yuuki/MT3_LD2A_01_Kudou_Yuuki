@@ -17,12 +17,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	char keys[256] = {0};
 	char preKeys[256] = {0};
 
-	Ball ball = {
-	    {1.2f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-        {0.0f, 0.0f, 0.0f},
-        2.0f, 0.2f, BLUE,
-	};
+	
+Plane plane;
+plane. normal = Normalize({-0.2f, 0.9f, -0.3f});
+plane. distance = 0.0f;
+
+Ball ball;
+ball.position = {0.8f, 1.2f, 0.3f};
+ball.mass = 2.0f;
+ball.radius = 0.05f;
+ball. color = WHITE;
+ball.acceleration = {0.0f, -9.8f, 0.0f};
+ball.velocity = {0.0f, 0.0f, 0.0f}; // 初期化必須！
+const float e = 1.0f;               // 反発係数（0=完全非弾性, 1=完全弾性）
+
 
 	struct ConicalPendulum {
 		Vector3 anchor;
@@ -90,31 +98,32 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		cameraPosition.x += camMove.x * 0.05f;
 		cameraPosition.z += camMove.z * 0.05f;
 
-		// 円錐振り子計算
-		if (isActive) {
-			conicalPendulum.angularVelocity = std::sqrt(9.8f / (conicalPendulum.length) * std::cos(conicalPendulum.halfApexAngle));
-			conicalPendulum.angle += conicalPendulum.angularVelocity * deltaTime;
+		ball.velocity += ball.acceleration * deltaTime;
+		ball.position += ball.velocity * deltaTime;
+		if (IsCollision(Sphere{ball.position, ball.radius}, plane)) {
+			Vector3 reflected = Reflect(ball.velocity, plane.normal);
+			Vector3 projectToNormal = Project(reflected, plane.normal);
+			Vector3 movingDirection = reflected - projectToNormal;
+			ball.velocity = projectToNormal * e + movingDirection;
 		}
-
-		float radius = std::sin(conicalPendulum.halfApexAngle) * conicalPendulum.length;
-		float height = std::cos(conicalPendulum.halfApexAngle) * conicalPendulum.length;
-
-		ball.position.x = conicalPendulum.anchor.x + std::cos(conicalPendulum.angle) * radius;
-		ball.position.y = conicalPendulum.anchor.y - height;
-		ball.position.z = conicalPendulum.anchor.z - std::sin(conicalPendulum.angle) * radius;
 
 		// 描画
 		DrawGrid(vpMatrix, viewportMatrix, cameraPosition);
 		DrawSphere({ball.position, ball.radius}, vpMatrix, viewportMatrix, ball.color);
-		DrawSphere({conicalPendulum.anchor, 0.05f}, vpMatrix, viewportMatrix, RED);
-
+		DrawPlane(plane, vpMatrix, viewportMatrix,WHITE);
 		Vector3 screenAnchor = Transform(Transform(conicalPendulum.anchor, vpMatrix), viewportMatrix);
 		Vector3 screenBall = Transform(Transform(ball.position, vpMatrix), viewportMatrix);
-		Novice::DrawLine(int(screenAnchor.x), int(screenAnchor.y), int(screenBall.x), int(screenBall.y), BLACK);
-
-		ImGui::Begin("Window");
+		
+	ImGui::Begin("Window");
 		if (ImGui::Button("Start")) {
 			isActive = true;
+
+			// ボールの状態をリセット
+			ball.position = {0.8f, 1.2f, 0.3f};
+			ball.velocity = {0.0f, 0.0f, 0.0f};
+			ball.acceleration = {0.0f, -9.8f, 0.0f};
+			ball.radius = 0.05f;
+			ball.color = WHITE;
 		}
 		ImGui::End();
 

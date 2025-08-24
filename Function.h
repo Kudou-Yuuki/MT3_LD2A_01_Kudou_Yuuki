@@ -53,7 +53,7 @@ struct Ball {
 	float radius;
 	int color;
 };
-
+Vector3 Reflect(const Vector3 &input, const Vector3& normal);
 Vector3 Multiply(const Vector3 vector1, const Vector3& vector2);
 
 	void MatrixScreenPrintf(int x, int y, const Matrix4x4& matrix, const char* label);

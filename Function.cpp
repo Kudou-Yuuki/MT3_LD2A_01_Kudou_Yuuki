@@ -497,6 +497,16 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment) {
 		return Add(segment.origin, {segment.diff.x * t, segment.diff.y * t, segment.diff.z * t}); // Closest point is within the segment
 	}
 }
+Vector3 Reflect(const Vector3& input, const Vector3& normal) {
+	// normal は正規化されている前提
+	float dot = input.x * normal.x + input.y * normal.y + input.z * normal.z;
+	Vector3 result;
+	result.x = input.x - 2.0f * dot * normal.x;
+	result.y = input.y - 2.0f * dot * normal.y;
+	result.z = input.z - 2.0f * dot * normal.z;
+	return result;
+}
+
 Vector3 Multiply(const Vector3 vector1, const Vector3& vector2) {
 	Vector3 result;
 	result.x = vector1.x * vector2.x;
